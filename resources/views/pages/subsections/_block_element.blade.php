@@ -15,10 +15,10 @@
                 $keywords = array_filter($keywords);
             @endphp
             @if(!empty($keywords))
-                <div class="mt-2">
+                <div class="mt-2 border border-yellow-500 p-6 pb-4 rounded-2xl">
                     <span class="font-semibold">Ключові слова:</span>
                     @foreach($keywords as $keyword)
-                        <span class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#{{ $keyword }}</span>
+                        <span class="inline-block py-1 text-base font-light text-gray-700 mr-1 mb-2 underline decoration-dotted underline-offset-3">{{ $keyword }}, </span>
                     @endforeach
                 </div>
             @else

@@ -3,9 +3,21 @@
 @section('title', 'Словник-довідник')
 
 @section('content')
-<div class="container mx-auto px-4 py-8">
-    <h1 class="text-3xl font-bold mb-6">Словник-довідник</h1>
-
+<div class="flex flex-col items-center justify-center border-b border-yellow-500 mb-8">
+    <div class="container flex flex-col md:flex-row mx-auto lg:px-8 px-4">
+        <div class="w-3/4 flex flex-col justify-center">
+            <h1 class="text-4xl font-bold mb-4 uppercase text-[#28569A]">Словник-довідник</h1>
+            <h2 class="text-base mb-4">Перглянути нові поняття та терміни
+            </h2>
+        </div>
+        <div class="w-1/4 flex flex-col items-center justify-center">
+            <div class="flex flex-col items-center justify-center">
+                <img src="{{ asset('storage/biblio-img.jpg') }}" alt="Section 1" class="w-full h-auto">
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container mx-auto px-4 lg:px-8 py-8">   
     {{-- Панель фильтрации по буквам --}}
     @if($letters->isNotEmpty())
         <div class="mb-8 flex flex-wrap justify-center space-x-1">
@@ -31,23 +43,32 @@
             @if(!$selectedLetter)
                 <h2 class="text-2xl font-semibold mt-6 mb-3 text-gray-700">{{ $letter }}</h2>
             @endif
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                @foreach($termsByLetter as $term)
-                    <div class="bg-white shadow-lg rounded-lg p-6 hover:shadow-xl transition-shadow">
-                        <h3 class="text-xl font-semibold mb-2 text-green-700">{{ $term->name }}</h3>
-                        @if($term->image_path)
-                            <img src="{{ asset('storage/' . $term->image_path) }}" alt="{{ $term->name }}" class="w-full h-auto object-cover rounded mb-3 max-h-40">
-                        @endif
-                        <p class="text-gray-600 text-sm mb-3">{!! process_figure_links(Str::limit($term->definition, 150)) !!}</p>
-                        <a href="{{ route('terms.show', $term) }}" 
-                           class="inline-flex items-center text-green-600 hover:text-green-800 text-sm font-medium">
-                            Детальніше
-                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                            </svg>
+            
+            @php
+                $totalTerms = count($termsByLetter);
+                $halfCount = ceil($totalTerms / 2);
+                $column1 = $termsByLetter->take($halfCount);
+                $column2 = $termsByLetter->skip($halfCount);
+            @endphp
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-x-20 gap-y-6">
+                {{-- Первая колонка --}}
+                <div class="space-y-6">
+                    @foreach($column1 as $term)
+                        <a href="{{ route('terms.show', $term) }}">
+                            <h3 class="text-xl font-semibold mb-2 text-green-700 underline decoration-dotted underline-offset-3">{{ $term->name }}</h3>
                         </a>
-                    </div>
-                @endforeach
+                    @endforeach
+                </div>
+                
+                {{-- Вторая колонка --}}
+                <div class="space-y-6">
+                    @foreach($column2 as $term)
+                        <a href="{{ route('terms.show', $term) }}">
+                            <h3 class="text-xl font-semibold mb-2 text-green-700 underline decoration-dotted underline-offset-3">{{ $term->name }}</h3>
+                        </a>
+                    @endforeach
+                </div>
             </div>
         @endforeach
     @endif

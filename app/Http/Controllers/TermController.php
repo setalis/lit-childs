@@ -20,12 +20,17 @@ class TermController extends Controller
         $query = Term::orderBy('name');
 
         if ($selectedLetter) {
-            $query->where('first_letter', $selectedLetter);
+            // Ищем термины, которые начинаются с этой буквы (независимо от регистра)
+            $query->whereRaw('UPPER(SUBSTRING(name, 1, 1)) = ?', [strtoupper($selectedLetter)]);
         }
 
-        $terms = $query->get()->groupBy('first_letter');
+        $terms = $query->get()->groupBy(function ($term) {
+            // Группируем по заглавной первой букве
+            return mb_strtoupper(mb_substr($term->name, 0, 1, 'UTF-8'), 'UTF-8');
+        });
 
-        $letters = Term::select('first_letter')
+        // Получаем уникальные заглавные буквы для навигации
+        $letters = Term::selectRaw('UPPER(SUBSTRING(name, 1, 1)) as first_letter')
                       ->distinct()
                       ->orderBy('first_letter')
                       ->pluck('first_letter')
@@ -52,6 +57,9 @@ class TermController extends Controller
             'definition' => 'required|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
+
+        // Приводим первую букву к заглавной для украинских символов
+        $validated['name'] = mb_strtoupper(mb_substr($validated['name'], 0, 1, 'UTF-8'), 'UTF-8') . mb_substr($validated['name'], 1, null, 'UTF-8');
 
         if ($request->hasFile('image')) {
             $imagePath = $request->file('image')->store('terms', 'public');
@@ -94,6 +102,9 @@ class TermController extends Controller
             'definition' => 'required|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
+
+        // Приводим первую букву к заглавной для украинских символов
+        $validated['name'] = mb_strtoupper(mb_substr($validated['name'], 0, 1, 'UTF-8'), 'UTF-8') . mb_substr($validated['name'], 1, null, 'UTF-8');
 
         if ($request->hasFile('image')) {
             // Удаляем старое изображение
