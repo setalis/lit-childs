@@ -87,21 +87,24 @@
     </main>
 
     {{-- Навигационные кнопки --}}
-    <div class="mt-8 flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0 sm:space-x-4">
-        <a href="{{ route('subsections.show', $subsection) }}" class="nav-button nav-button-secondary w-full sm:w-auto">
-            <svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-5 w-5 inline-block mr-2\" viewBox=\"0 0 20 20\" fill=\"currentColor\"><path fill-rule=\"evenodd\" d=\"M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z\" clip-rule=\"evenodd\" /></svg>
-            Повернутися до підрозділу
+    <div class="mt-8 flex flex-col w-2/3 mx-auto sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-4">
+        <a href="{{ route('subsections.show', $subsection) }}" class="nav-button border border-yellow-500 text-yellow-500 w-full sm:w-auto">
+            <!-- <svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-5 w-5 inline-block mr-2\" viewBox=\"0 0 20 20\" fill=\"currentColor\"><path fill-rule=\"evenodd\" d=\"M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z\" clip-rule=\"evenodd\" /></svg> -->
+            Повернутися
         </a>
-        
-        <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 w-full sm:w-auto">
-            @if($subsection->practiceBlocks()->exists())
+        <a href="{{ route('sections.index') }}" class="nav-button nav-button-secondary w-full sm:w-auto">Зміст</a>
+        @if($subsection->practiceBlocks()->exists())
             <a href="{{ route('blocks.practice.show', [$subsection, $subsection->practiceBlocks()->orderBy('order')->first()]) }}" class="nav-button nav-button-primary w-full sm:w-auto">
                 Практична робота
-                <svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-5 w-5 inline-block ml-2\" viewBox=\"0 0 20 20\" fill=\"currentColor\"><path fill-rule=\"evenodd\" d=\"M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z\" clip-rule=\"evenodd\" /></svg>
+                <!-- <svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-5 w-5 inline-block ml-2\" viewBox=\"0 0 20 20\" fill=\"currentColor\"><path fill-rule=\"evenodd\" d=\"M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z\" clip-rule=\"evenodd\" /></svg> -->
             </a>
-            @endif
-            <a href="{{ route('sections.index') }}" class="nav-button nav-button-secondary w-full sm:w-auto">Зміст</a>
-        </div>
+        @endif
+        
+        <!-- <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 w-full sm:w-auto">
+            
+            
+        </div> -->
+        
     </div>
 </div>
 @endsection 

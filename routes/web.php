@@ -89,6 +89,14 @@ Route::get('test/figures-demo', function () {
     return view('pages.test.demo-figures');
 })->name('test.figures-demo');
 
+Route::get('test/flexible-links', function () {
+    return view('pages.test.flexible-links-test');
+})->name('test.flexible-links');
+
+Route::get('test/simple', function () {
+    return view('pages.test.simple-test');
+})->name('test.simple');
+
 Route::get('shablon/dictionary', function () {
     return view('pages.shablon.dictionary');
 })->name('shablon.dictionary');
