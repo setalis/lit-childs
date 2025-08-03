@@ -20,14 +20,13 @@
                                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                      <div>
                          <label for="first_name" class="block text-sm font-medium text-gray-700 mb-2">
-                             Ім'я *
+                             Ім'я
                          </label>
                          <input type="text" 
                                 name="first_name" 
                                 id="first_name" 
                                 value="{{ old('first_name', $figure->first_name) }}"
-                                class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 @error('first_name') border-red-500 @enderror"
-                                required>
+                                class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 @error('first_name') border-red-500 @enderror">
                          @error('first_name')
                              <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                          @enderror

@@ -7,23 +7,15 @@
             @break
 
         @case('keywords')
-            @php
-                // Убираем json_decode, так как из админки приходит просто строка
-                // Разделяем строку по запятой, удаляем пробелы вокруг каждого слова
-                $keywords = !empty($element->content) && is_string($element->content) ? array_map('trim', explode(',', $element->content)) : [];
-                // Удаляем пустые элементы, которые могут появиться из-за лишних запятых
-                $keywords = array_filter($keywords);
-            @endphp
-            @if(!empty($keywords))
+            @if($element->processed_keywords)
                 <div class="mt-2 border border-yellow-500 p-6 pb-4 rounded-2xl">
                     <span class="font-semibold">Ключові слова:</span>
-                    @foreach($keywords as $keyword)
-                        <span class="inline-block py-1 text-base font-light text-gray-700 mr-1 mb-2 underline decoration-dotted underline-offset-3">{{ $keyword }}, </span>
+                    @foreach($element->processed_keywords as $keyword)
+                        <span class="inline-block py-1 text-base font-light text-gray-700 mr-1">
+                            {!! $keyword !!},
+                        </span>
                     @endforeach
                 </div>
-            @else
-                 {{-- Можно добавить сообщение, если ключевые слова не указаны или контент пуст --}}
-                 {{-- <p class="text-sm text-gray-500">Ключові слова не вказані.</p> --}}
             @endif
             @break
 

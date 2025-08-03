@@ -48,8 +48,8 @@
 <div class="flex flex-col items-center justify-center border-b border-yellow-500">
     <div class="container flex flex-col md:flex-row mx-auto lg:px-8 px-4">
         <div class="w-3/4 flex flex-col justify-center">
-            <h1 class="text-4xl font-bold mb-4 uppercase text-[#28569A]">Теоретичний матеріал</h1>
-            <h2 class="text-3xl font-bold mb-4 uppercase">{{ $subsection->title }}</h2>
+            <h1 class="text-4xl font-normal mb-4 text-[#28569A]">Теоретичний матеріал</h1>
+            <h2 class="text-2xl font-normal mb-2 text-gray-700">{{ $subsection->section->order }}.{{ $subsection->order }} {{ $subsection->title }}</h2>
         </div>
         <div class="w-1/4 flex flex-col items-center justify-center">
             <div class="flex flex-col items-center justify-center">
@@ -70,7 +70,7 @@
             <li><span>/</span></li>
             <li><a href="{{ route('subsections.show', $subsection) }}" class="text-[#3A6EA5] hover:underline">{{ $subsection->title }}</a></li>
             <li><span>/</span></li>
-            <li class="text-gray-700" aria-current="page">Теоретичний матеріал</li>
+            <li class="text-gray-700" aria-current="page">Теоретичний матеріал ({{ $subsection->section->order }}.{{ $subsection->order }})</li>
         </ol>
     </nav>  
     

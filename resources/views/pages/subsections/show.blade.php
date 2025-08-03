@@ -32,10 +32,10 @@
     </nav>
 
     {{-- Заголовок подраздела --}}
-    <div class="bg-gradient-to-r from-green-600 to-green-800 rounded-lg shadow-lg mb-8 py-8 px-6 text-white">
+    <!-- <div class="bg-gradient-to-r from-green-600 to-green-800 rounded-lg shadow-lg mb-8 py-8 px-6 text-white">
         <h1 class="text-3xl sm:text-4xl font-bold mb-2">{{ $subsection->title }}</h1>
         <p class="text-green-100">Розділ: {{ $subsection->section->title }}</p>
-    </div>
+    </div> -->
 
     {{-- Навигационные кнопки --}}
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
@@ -43,9 +43,10 @@
         @if($subsection->theoryBlock)
             <a href="{{ route('blocks.theory.show', $subsection) }}" class="nav-card-button button-theory">
                 <div class="flex items-center justify-center w-12 h-12 bg-blue-500 rounded-lg mb-4">
-                    <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#fff" class="bi bi-card-heading" viewBox="0 0 16 16">
+                    <path d="M14.5 3a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5zm-13-1A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2z"/>
+                    <path d="M3 8.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5m0 2a.5.5 0 0 1 .5-.5h6a.5.5 0 0 1 0 1h-6a.5.5 0 0 1-.5-.5m0-5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5z"/>
+                </svg>
                 </div>
                 <h3 class="text-lg font-semibold mb-2">Теоретичний матеріал</h3>
                 <p class="text-sm text-gray-600">Основні поняття та концепції</p>
@@ -56,15 +57,16 @@
 
         {{-- Практические задания --}}
         @if($subsection->practiceBlocks->isNotEmpty())
-            <div class="nav-card-button button-practice">
+            <a href="{{ route('blocks.practice.all', $subsection) }}" class="nav-card-button button-practice">
                 <div class="flex items-center justify-center w-12 h-12 bg-orange-500 rounded-lg mb-4">
-                    <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z"></path>
-                    </svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#fff" class="bi bi-card-text" viewBox="0 0 16 16">
+                    <path d="M14.5 3a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5zm-13-1A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2z"/>
+                        <path d="M3 5.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5M3 8a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9A.5.5 0 0 1 3 8m0 2.5a.5.5 0 0 1 .5-.5h6a.5.5 0 0 1 0 1h-6a.5.5 0 0 1-.5-.5"/>
+                </svg>
                 </div>
                 <h3 class="text-lg font-semibold mb-2">Практичні завдання</h3>
                 <p class="text-sm text-gray-600">{{ $subsection->practiceBlocks->count() }} завдань</p>
-            </div>
+            </a>
         @else
             <div class="nav-card-button button-practice opacity-50 cursor-not-allowed">Практичні завдання (немає)</div>
         @endif
@@ -73,10 +75,10 @@
         @if($subsection->homeworkBlock)
             <a href="{{ route('blocks.homework.show', $subsection) }}" class="nav-card-button button-homework">
                 <div class="flex items-center justify-center w-12 h-12 bg-purple-500 rounded-lg mb-4">
-                    <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"></path>
-                        <path fill-rule="evenodd" d="M4 5a2 2 0 012-2v1a1 1 0 102 0V3a2 2 0 012 2v6a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 1a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"></path>
-                    </svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#fff" class="bi bi-card-list" viewBox="0 0 16 16">
+                    <path d="M14.5 3a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5zm-13-1A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2z"/>
+                    <path d="M5 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 5 8m0-2.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5m0 5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5m-1-5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0M4 8a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0m0 2.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0"/>
+                </svg>
                 </div>
                 <h3 class="text-lg font-semibold mb-2">Самостійна робота</h3>
                 <p class="text-sm text-gray-600">Завдання для виконання</p>
@@ -89,9 +91,10 @@
         @if($subsection->controlBlocks->isNotEmpty())
             <div class="nav-card-button button-control">
                 <div class="flex items-center justify-center w-12 h-12 bg-red-500 rounded-lg mb-4">
-                    <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
-                    </svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#fff" class="bi bi-card-checklist" viewBox="0 0 16 16">
+                    <path d="M14.5 3a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5zm-13-1A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2z"/>
+                    <path d="M7 5.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5m-1.496-.854a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708l.146.147 1.146-1.147a.5.5 0 0 1 .708 0M7 9.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5m-1.496-.854a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 0 1 .708-.708l.146.147 1.146-1.147a.5.5 0 0 1 .708 0"/>
+                </svg>
                 </div>
                 <h3 class="text-lg font-semibold mb-2">Засоби перевірки</h3>
                 <p class="text-sm text-gray-600">{{ $subsection->controlBlocks->count() }} блоків</p>
@@ -99,16 +102,7 @@
         @else
             <div class="nav-card-button button-control opacity-50 cursor-not-allowed">Засоби перевірки (немає)</div>
         @endif
-    </div>
-
-    {{-- Навигационные кнопки внизу страницы --}}
-    <div class="mt-8 flex flex-col sm:flex-row justify-start items-center space-y-4 sm:space-y-0 sm:space-x-4">
-        <a href="{{ route('sections.show', $subsection->section) }}" class="nav-button nav-button-secondary w-full sm:w-auto">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
-            До змісту розділу
-        </a>
-        <a href="{{ route('sections.index') }}" class="nav-button nav-button-secondary w-full sm:w-auto">До змісту підручника</a>
-    </div>
+    </div>    
 
     {{-- Теоретический блок --}}
     @if($subsection->theoryBlock && $subsection->theoryBlock->elements->isNotEmpty())
@@ -122,21 +116,50 @@
 
     {{-- Практические задания --}}
     @if($subsection->practiceBlocks->isNotEmpty())
-        <div class="mb-8">
-            <h2 class="text-2xl font-semibold mb-4 text-green-700">Практичні завдання</h2>
-            @foreach($subsection->practiceBlocks as $practiceBlock)
-                <div class="mb-6 p-6 bg-white shadow-lg rounded-lg">
-                    <h3 class="text-xl font-medium mb-2">Рівень: 
-                        @if($practiceBlock->level === 'reproductive') Репродуктивний
-                        @elseif($practiceBlock->level === 'constructive') Конструктивний
-                        @elseif($practiceBlock->level === 'creative') Творчий
-                        @endif
-                    </h3>
-                    @foreach($practiceBlock->elements as $element)
-                        @include('pages.subsections._block_element', ['element' => $element])
-                    @endforeach
-                </div>
-            @endforeach
+        <div class="mb-8 p-6 bg-white shadow-lg rounded-lg">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-2xl font-semibold text-green-700">Практичні завдання</h2>
+                <a href="{{ route('blocks.practice.all', $subsection) }}" 
+                   class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors text-sm">
+                    Переглянути всі
+                </a>
+            </div>
+            <p class="text-gray-600 mb-4">Доступні рівні складності: 
+                @php
+                    $levels = $subsection->practiceBlocks->pluck('level')->unique();
+                    $levelNames = $levels->map(function($level) {
+                        return match($level) {
+                            'reproductive' => 'Репродуктивний',
+                            'constructive' => 'Конструктивний', 
+                            'creative' => 'Творчий',
+                            default => ucfirst($level)
+                        };
+                    })->join(', ');
+                @endphp
+                {{ $levelNames }}
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                @foreach($subsection->practiceBlocks->take(3) as $practiceBlock)
+                    <a href="{{ route('blocks.practice.show', [$subsection, $practiceBlock]) }}" 
+                       class="block p-4 border border-gray-200 rounded-lg hover:border-green-300 hover:bg-green-50 transition-all duration-200">
+                        <h3 class="font-medium text-gray-800 mb-2">
+                            Практичне завдання №{{ $practiceBlock->order }}
+                        </h3>
+                        <div class="flex flex-row items-center justify-between ">
+                            <p class="text-sm text-gray-600 font-semibold">Рівень: </p>
+                        <span class="inline-block px-2 py-1 text-xs font-medium rounded                        
+                            @if($practiceBlock->level === 'reproductive') bg-green-100 text-green-800
+                            @elseif($practiceBlock->level === 'constructive') bg-yellow-100 text-yellow-800
+                            @elseif($practiceBlock->level === 'creative') bg-red-100 text-red-800
+                            @endif">
+                            @if($practiceBlock->level === 'reproductive') Репродуктивний
+                            @elseif($practiceBlock->level === 'constructive') Конструктивний
+                            @elseif($practiceBlock->level === 'creative') Творчий
+                            @endif
+                        </span></div>
+                    </a>
+                @endforeach
+            </div>
         </div>
     @endif
 
@@ -152,47 +175,64 @@
 
     {{-- Способы контроля --}}
     @if($subsection->controlBlocks->isNotEmpty())
-        <div class="mb-8">
-            <h2 class="text-2xl font-semibold mb-4 text-red-700">Способи контролю</h2>
-            @foreach($subsection->controlBlocks as $controlBlock)
-                <div class="mb-6 p-6 bg-white shadow-lg rounded-lg">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-xl font-medium">Засоби перевірки знань</h3>
-                        <a href="{{ route('blocks.control.show', [$subsection, $controlBlock]) }}" 
-                           class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors text-sm">
-                            Переглянути все
-                        </a>
-                    </div>
-                    
-                    {{-- Краткий превью содержимого --}}
-                    @if($controlBlock->elements->isNotEmpty())
-                        <div class="mb-4 p-3 bg-blue-50 border-l-4 border-blue-500">
-                            <h4 class="font-medium text-blue-800 mb-2">Питання для самоперевірки</h4>
-                            <p class="text-blue-700 text-sm">
-                                {{ $controlBlock->elements->count() }} {{ $controlBlock->elements->count() === 1 ? 'питання' : 'питань' }}
-                            </p>
+        <div class="mb-8 p-6 bg-white shadow-lg rounded-lg">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-2xl font-semibold text-red-700">Способи контролю</h2>
+                <a href="{{ route('blocks.control.all', $subsection) }}" 
+                   class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors text-sm">
+                    Переглянути всі
+                </a>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                @foreach($subsection->controlBlocks as $controlBlock)
+                    <div class="p-4 border border-gray-200 rounded-lg">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="text-lg font-medium text-gray-800">Засоби перевірки знань</h3>
+                            <a href="{{ route('blocks.control.show', [$subsection, $controlBlock]) }}" 
+                               class="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 transition-colors text-xs">
+                                Переглянути
+                            </a>
                         </div>
-                    @endif
-                    
-                    {{-- Превью назначенного теста --}}
-                    @if($controlBlock->test)
-                        <div class="mb-4 p-3 bg-green-50 border-l-4 border-green-500">
-                            <h4 class="font-medium text-green-800 mb-2">{{ $controlBlock->test->title }}</h4>
-                            <div class="flex items-center justify-between">
-                                <span class="text-sm text-green-700">
-                                    Питань: {{ $controlBlock->test->questions->count() }}
-                                </span>
-                                <a href="{{ route('test.show', $controlBlock->test->id) }}" 
-                                   class="px-3 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700 transition-colors">
-                                    Розпочати тест
-                                </a>
+                        
+                        {{-- Краткий превью содержимого --}}
+                        @if($controlBlock->elements->isNotEmpty())
+                            <div class="mb-3 p-2 bg-blue-50 border-l-3 border-blue-500 rounded-r">
+                                <h4 class="font-medium text-blue-800 text-sm mb-1">Питання для самоперевірки</h4>
+                                <p class="text-blue-700 text-xs">
+                                    {{ $controlBlock->elements->count() }} {{ $controlBlock->elements->count() === 1 ? 'питання' : 'питань' }}
+                                </p>
                             </div>
-                        </div>
-                    @endif
-                </div>
-            @endforeach
+                        @endif
+                        
+                        {{-- Превью назначенного теста --}}
+                        @if($controlBlock->test)
+                            <div class="p-2 bg-green-50 border-l-3 border-green-500 rounded-r">
+                                <h4 class="font-medium text-green-800 text-sm mb-1">{{ $controlBlock->test->title }}</h4>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs text-green-700">
+                                        Питань: {{ $controlBlock->test->questions->count() }}
+                                    </span>
+                                    <a href="{{ route('test.show', $controlBlock->test->id) }}" 
+                                       class="px-2 py-1 bg-green-600 text-white rounded text-xs hover:bg-green-700 transition-colors">
+                                        Розпочати
+                                    </a>
+                                </div>
+                            </div>
+                        @endif
+                    </div>
+                @endforeach
+            </div>
         </div>
     @endif
+
+    {{-- Навигационные кнопки внизу страницы --}}
+    <div class="mt-8 flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-4">
+        <a href="{{ route('sections.show', $subsection->section) }}" class="w-full sm:w-auto border font-semibold border-yellow-500 bg-yellow-500 px-4 py-3 rounded-full">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
+            До змісту розділу
+        </a>
+        <a href="{{ route('sections.index') }}" class="nav-button nav-button-secondary w-full sm:w-auto px-4 py-3 border border-[#94BDDD] rounded-full">До змісту підручника</a>
+    </div>
 
 </div>
 @endsection 

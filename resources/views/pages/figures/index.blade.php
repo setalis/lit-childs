@@ -31,21 +31,44 @@
             @if(!$selectedLetter)
                 <h2 class="text-2xl font-semibold mt-6 mb-3 text-gray-700">{{ $letter }}</h2>
             @endif
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 @foreach($figuresByLetter as $figure)
-                    <div class="bg-white shadow-lg rounded-lg p-6">
-                                                 <h3 class="text-xl font-semibold mb-2 text-blue-700">{{ $figure->display_name }}</h3>
+                    <div class="bg-white border border-yellow-400 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
+                        {{-- Изображение --}}
                         @if($figure->image_path)
-                            <img src="{{ asset('storage/' . $figure->image_path) }}" alt="{{ $figure->name }}" class="w-full h-auto object-cover rounded mb-3 max-h-60">
+                            <div class="w-full h-48 overflow-hidden">
+                                <img src="{{ asset('storage/' . $figure->image_path) }}" 
+                                     alt="{{ $figure->name }}" 
+                                     class="w-full h-full object-cover">
+                            </div>
+                        @else
+                            <div class="w-full h-48 bg-gray-200 flex items-center justify-center">
+                                <svg class="w-16 h-16 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
+                                </svg>
+                            </div>
                         @endif
-                        <p class="text-gray-600 text-sm mb-3">{!! process_figure_links(Str::limit($figure->biography, 200)) !!}</p>
-                        <a href="{{ route('figures.show', $figure) }}" 
-                           class="inline-flex items-center text-blue-600 hover:text-blue-800 text-sm font-medium">
-                            Детальніше
-                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                            </svg>
-                        </a>
+                        
+                        {{-- Контент карточки --}}
+                        <div class="p-6">
+                            {{-- Имя и годы жизни --}}
+                            <h3 class="text-xl font-semibold mb-2 text-gray-800 leading-tight">
+                                {{ $figure->display_name }}
+                            </h3>
+                            
+                            {{-- Краткое описание --}}
+                            <p class="text-gray-600 text-sm mb-4 leading-relaxed">
+                                {!! process_figure_links(Str::limit($figure->biography, 120)) !!}
+                            </p>
+                            
+                            {{-- Кнопка "Докладніше" --}}
+                            <div class="flex justify-start">
+                                <a href="{{ route('figures.show', $figure) }}" 
+                                   class="inline-flex items-center px-6 py-3 bg-yellow-400 text-black font-semibold rounded-full hover:bg-yellow-500 transition-colors duration-200 text-sm uppercase tracking-wide">
+                                    Докладніше
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 @endforeach
             </div>

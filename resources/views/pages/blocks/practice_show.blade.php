@@ -56,6 +56,20 @@
 @endpush
 
 @section('content')
+{{-- Заголовок блока с фоном --}}
+<div class="flex flex-col items-center justify-center border-b border-yellow-500">
+    <div class="container flex flex-col md:flex-row mx-auto lg:px-8 px-4">
+        <div class="w-3/4 flex flex-col justify-center">
+            <h1 class="text-4xl font-bold mb-4 text-[#28569A]">Практичні завдання</h1>
+            <h2 class="text-2xl font-semibold mb-2 text-gray-700">{{ $subsection->section->order }}.{{ $subsection->order }} {{ $subsection->title }}</h2>
+        </div>
+        <div class="w-1/4 flex flex-col items-center justify-center">
+            <div class="flex flex-col items-center justify-center">
+                <img src="{{ asset('storage/header-1.png') }}" alt="Section 1" class="w-full h-auto">
+            </div>
+        </div>
+    </div>
+</div>
 <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
     {{-- Хлебные крошки --}}
     <nav class="mb-6 text-sm text-gray-500" aria-label="Breadcrumb">
@@ -68,7 +82,7 @@
             <li><span>/</span></li>
             <li><a href="{{ route('subsections.show', $subsection) }}" class="text-[#3A6EA5] hover:underline">{{ $subsection->title }}</a></li>
             <li><span>/</span></li>
-            <li class="text-gray-700" aria-current="page">Практична робота №{{ $practiceBlock->order }}</li>
+            <li class="text-gray-700" aria-current="page">Практична робота №{{ $practiceBlock->order }} ({{ $subsection->section->order }}.{{ $subsection->order }})</li>
         </ol>
     </nav>
 
@@ -125,17 +139,22 @@
             До підрозділу
         </a>
         
+        <a href="{{ route('blocks.practice.all', $subsection) }}" class="nav-button nav-button-secondary w-full sm:w-auto">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd" /></svg>
+            Всі практичні роботи
+        </a>
+        
         <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 w-full sm:w-auto">
             @if($prevPractice)
-                <a href="{{ route('blocks.practice.show', [$subsection, $prevPractice]) }}" class="nav-button nav-button-primary w-full sm:w-auto">
+                <a href="{{ route('blocks.practice.all', $subsection) }}?block_id={{ $prevPractice->id }}" class="nav-button nav-button-primary w-full sm:w-auto">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
-                    Практ. №{{$prevPractice->order}}
+                    Практ. №{{$prevPractice->order}} ({{ $subsection->section->order }}.{{ $subsection->order }})
                 </a>
             @endif
 
             @if($nextPractice)
-                <a href="{{ route('blocks.practice.show', [$subsection, $nextPractice]) }}" class="nav-button nav-button-primary w-full sm:w-auto">
-                    Практ. №{{$nextPractice->order}}
+                <a href="{{ route('blocks.practice.all', $subsection) }}?block_id={{ $nextPractice->id }}" class="nav-button nav-button-primary w-full sm:w-auto">
+                    Практ. №{{$nextPractice->order}} ({{ $subsection->section->order }}.{{ $subsection->order }})
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block ml-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" /></svg>
                 </a>
             @else

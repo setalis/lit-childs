@@ -31,7 +31,25 @@ class FigureLinkService
         // Базовое слово
         $variants[] = $word;
         
-        // Убираем возможные окончания и добавляем варианты
+        // Если это составной термин (содержит пробелы), обрабатываем его по-другому
+        if (strpos($word, ' ') !== false) {
+            // Для составных терминов добавляем только базовую форму и возможные варианты
+            $variants[] = $word; // Оригинальная форма
+            
+            // Можно добавить варианты с разными окончаниями последнего слова
+            $words = explode(' ', $word);
+            $lastWord = end($words);
+            $baseLastWord = $this->getBaseForm($lastWord);
+            
+            if ($baseLastWord !== $lastWord) {
+                $words[count($words) - 1] = $baseLastWord;
+                $variants[] = implode(' ', $words);
+            }
+            
+            return array_unique($variants);
+        }
+        
+        // Для одиночных слов - стандартная обработка
         $base = $this->getBaseForm($word);
         if ($base !== $word) {
             $variants[] = $base;
@@ -134,8 +152,15 @@ class FigureLinkService
         foreach ($variants as $variant) {
             // Экранируем специальные символы
             $escaped = preg_quote($variant, '/');
-            // Создаем паттерн с границами слов и игнорированием регистра
-            $patterns[] = '\b' . $escaped . '\b';
+            
+            // Если термин состоит из нескольких слов, используем более точный паттерн
+            if (strpos($variant, ' ') !== false) {
+                // Для составных терминов используем границы слов только в начале и конце
+                $patterns[] = '\b' . $escaped . '\b';
+            } else {
+                // Для одиночных слов используем границы слов
+                $patterns[] = '\b' . $escaped . '\b';
+            }
         }
         
         return '/(' . implode('|', $patterns) . ')/ui';
@@ -171,20 +196,72 @@ class FigureLinkService
             }
         }
         
-        // Обрабатываем термины
-        if (!$this->terms->isEmpty()) {
-            foreach ($this->terms as $term) {
-                $termName = $term->name;
-                
-                // Создаем гибкий паттерн для поиска
+        // Обрабатываем термины с использованием маркеров
+        $result = $this->processTermsWithMarkers($result);
+
+        return $result;
+    }
+
+    /**
+     * Обрабатывает термины с использованием маркеров для предотвращения конфликтов
+     *
+     * @param string $text
+     * @return string
+     */
+    private function processTermsWithMarkers(string $text): string
+    {
+        if ($this->terms->isEmpty()) {
+            return $text;
+        }
+
+        // Сортируем термины по длине (от длинных к коротким)
+        $sortedTerms = $this->terms->sortByDesc(function($term) {
+            return mb_strlen($term->name);
+        });
+
+        $result = $text;
+        $markerCounter = 0;
+        $markers = [];
+
+        // Сначала обрабатываем составные термины и помечаем их маркерами
+        foreach ($sortedTerms as $term) {
+            $termName = $term->name;
+            
+            // Если термин составной (содержит пробелы)
+            if (strpos($termName, ' ') !== false) {
                 $pattern = $this->createFlexiblePattern($termName);
                 
-                // Используем callback для сохранения оригинального текста
-                $result = preg_replace_callback($pattern, function($matches) use ($term, $termName) {
-                    $originalText = $matches[0]; // Оригинальный текст как есть
-                    return '<a href="' . route('terms.show', $term) . '" class="term-link text-green-600 hover:text-green-800 underline" title="Термін: ' . htmlspecialchars($termName) . '">' . htmlspecialchars($originalText) . '</a>';
-                }, $result, 1); // Заменяем только первое вхождение
+                $result = preg_replace_callback($pattern, function($matches) use ($term, $termName, &$markerCounter, &$markers) {
+                    $originalText = $matches[0];
+                    $marker = "___MARKER_{$markerCounter}___";
+                    $markers[$marker] = [
+                        'text' => $originalText,
+                        'link' => '<a href="' . route('terms.show', $term) . '" class="term-link text-green-600 hover:text-green-800 underline" title="Термін: ' . htmlspecialchars($termName) . '">' . htmlspecialchars($originalText) . '</a>'
+                    ];
+                    $markerCounter++;
+                    return $marker;
+                }, $result, 1);
             }
+        }
+
+        // Затем обрабатываем простые термины, но исключаем те, что уже обработаны
+        foreach ($sortedTerms as $term) {
+            $termName = $term->name;
+            
+            // Если термин простой (без пробелов)
+            if (strpos($termName, ' ') === false) {
+                $pattern = $this->createFlexiblePattern($termName);
+                
+                $result = preg_replace_callback($pattern, function($matches) use ($term, $termName) {
+                    $originalText = $matches[0];
+                    return '<a href="' . route('terms.show', $term) . '" class="term-link text-green-600 hover:text-green-800 underline" title="Термін: ' . htmlspecialchars($termName) . '">' . htmlspecialchars($originalText) . '</a>';
+                }, $result, 1);
+            }
+        }
+
+        // Заменяем маркеры обратно на ссылки
+        foreach ($markers as $marker => $data) {
+            $result = str_replace($marker, $data['link'], $result);
         }
 
         return $result;
@@ -229,29 +306,90 @@ class FigureLinkService
             }
         }
         
-        // Обрабатываем термины
-        if (!$this->terms->isEmpty()) {
-            foreach ($this->terms as $term) {
-                $termName = $term->name;
-                
+        // Обрабатываем термины с использованием маркеров
+        $result = $this->processTermsWithMarkersHtml($result);
+
+        return $result;
+    }
+
+    /**
+     * Обрабатывает термины в HTML с использованием маркеров для предотвращения конфликтов
+     *
+     * @param string $html
+     * @return string
+     */
+    private function processTermsWithMarkersHtml(string $html): string
+    {
+        if ($this->terms->isEmpty()) {
+            return $html;
+        }
+
+        // Сортируем термины по длине (от длинных к коротким)
+        $sortedTerms = $this->terms->sortByDesc(function($term) {
+            return mb_strlen($term->name);
+        });
+
+        $result = $html;
+        $markerCounter = 0;
+        $markers = [];
+
+        // Сначала обрабатываем составные термины и помечаем их маркерами
+        foreach ($sortedTerms as $term) {
+            $termName = $term->name;
+            
+            // Если термин составной (содержит пробелы)
+            if (strpos($termName, ' ') !== false) {
                 // Разбиваем текст на части: текст вне тегов и сами теги
                 $parts = preg_split('/(<[^>]*>)/', $result, -1, PREG_SPLIT_DELIM_CAPTURE);
                 
                 for ($i = 0; $i < count($parts); $i += 2) { // Обрабатываем только нечетные элементы (текст вне тегов)
                     if (isset($parts[$i])) {
-                        // Создаем гибкий паттерн для поиска
                         $pattern = $this->createFlexiblePattern($termName);
                         
-                        // Используем callback для сохранения оригинального текста
-                        $parts[$i] = preg_replace_callback($pattern, function($matches) use ($term, $termName) {
-                            $originalText = $matches[0]; // Оригинальный текст как есть
-                            return '<a href="' . route('terms.show', $term) . '" class="term-link text-green-600 hover:text-green-800 underline" title="Термін: ' . htmlspecialchars($termName) . '">' . htmlspecialchars($originalText) . '</a>';
-                        }, $parts[$i], 1); // Заменяем только первое вхождение
+                        $parts[$i] = preg_replace_callback($pattern, function($matches) use ($term, $termName, &$markerCounter, &$markers) {
+                            $originalText = $matches[0];
+                            $marker = "___MARKER_{$markerCounter}___";
+                            $markers[$marker] = [
+                                'text' => $originalText,
+                                'link' => '<a href="' . route('terms.show', $term) . '" class="term-link text-green-600 hover:text-green-800 underline" title="Термін: ' . htmlspecialchars($termName) . '">' . htmlspecialchars($originalText) . '</a>'
+                            ];
+                            $markerCounter++;
+                            return $marker;
+                        }, $parts[$i], 1);
                     }
                 }
                 
                 $result = implode('', $parts);
             }
+        }
+
+        // Затем обрабатываем простые термины
+        foreach ($sortedTerms as $term) {
+            $termName = $term->name;
+            
+            // Если термин простой (без пробелов)
+            if (strpos($termName, ' ') === false) {
+                // Разбиваем текст на части: текст вне тегов и сами теги
+                $parts = preg_split('/(<[^>]*>)/', $result, -1, PREG_SPLIT_DELIM_CAPTURE);
+                
+                for ($i = 0; $i < count($parts); $i += 2) { // Обрабатываем только нечетные элементы (текст вне тегов)
+                    if (isset($parts[$i])) {
+                        $pattern = $this->createFlexiblePattern($termName);
+                        
+                        $parts[$i] = preg_replace_callback($pattern, function($matches) use ($term, $termName) {
+                            $originalText = $matches[0];
+                            return '<a href="' . route('terms.show', $term) . '" class="term-link text-green-600 hover:text-green-800 underline" title="Термін: ' . htmlspecialchars($termName) . '">' . htmlspecialchars($originalText) . '</a>';
+                        }, $parts[$i], 1);
+                    }
+                }
+                
+                $result = implode('', $parts);
+            }
+        }
+
+        // Заменяем маркеры обратно на ссылки
+        foreach ($markers as $marker => $data) {
+            $result = str_replace($marker, $data['link'], $result);
         }
 
         return $result;

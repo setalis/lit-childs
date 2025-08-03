@@ -48,6 +48,72 @@
             pointer-events: none;
             margin-bottom: 5px;
         }
+
+        /* Стили для автоматических ссылок на термины */
+        .term-link {
+            position: relative;
+            text-decoration: underline;
+            text-decoration-style: dotted;
+            color: #059669 !important;
+        }
+
+        .term-link:hover {
+            text-decoration-style: solid;
+            color: #047857 !important;
+        }
+
+        .term-link:hover::after {
+            content: "Перейти до терміну";
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            white-space: nowrap;
+            z-index: 1000;
+            pointer-events: none;
+            margin-bottom: 5px;
+        }
+
+        /* Стили для обычных ссылок в контенте (не автоматических) */
+        .tinymce-content a:not(.figure-link):not(.term-link) {
+            color: #2563eb !important; /* Синий цвет для обычных ссылок */
+            text-decoration: underline;
+            text-decoration-color: #3b82f6;
+            text-decoration-thickness: 2px;
+            text-underline-offset: 2px;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .tinymce-content a:not(.figure-link):not(.term-link):hover {
+            color: #1d4ed8 !important;
+            text-decoration-color: #2563eb;
+            background-color: #eff6ff;
+            padding: 1px 2px;
+            border-radius: 3px;
+        }
+
+        /* Стили для ссылок в кнопках и других элементах */
+        .block-element a:not(.figure-link):not(.term-link) {
+            color: #2563eb !important;
+            text-decoration: underline;
+            text-decoration-color: #3b82f6;
+            text-decoration-thickness: 2px;
+            text-underline-offset: 2px;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .block-element a:not(.figure-link):not(.term-link):hover {
+            color: #1d4ed8 !important;
+            text-decoration-color: #2563eb;
+            background-color: #eff6ff;
+            padding: 1px 2px;
+            border-radius: 3px;
+        }
     </style>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

@@ -62,4 +62,23 @@ class BlockElement extends Model
     {
         return process_figure_links($this->content ?? '', true);
     }
+
+    /**
+     * Получает обработанные ключевые слова с автоматическими ссылками
+     *
+     * @return array
+     */
+    public function getProcessedKeywordsAttribute(): array
+    {
+        if ($this->element_type !== 'keywords' || empty($this->content)) {
+            return [];
+        }
+
+        $keywords = array_map('trim', explode(',', $this->content));
+        $keywords = array_filter($keywords);
+
+        return array_map(function($keyword) {
+            return process_figure_links($keyword, true);
+        }, $keywords);
+    }
 }

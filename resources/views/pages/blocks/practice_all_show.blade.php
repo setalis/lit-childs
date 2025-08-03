@@ -1,0 +1,245 @@
+@extends('layouts.app')
+
+@section('title', $subsection->title . ' - Практичні роботи - Schoolbook')
+
+@push('styles')
+<style>
+    .block-content-bg {
+        background-image: url("{{ asset('images/main-bg-1-1.png') }}"); 
+        background-size: cover;
+        background-position: center;
+        color: white; 
+    }
+    .content-card {
+        background-color: #ffffff;
+        border-radius: 0.5rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    .nav-button {
+        display: inline-block;
+        padding: 0.75rem 1.5rem;
+        border-radius: 9999px; 
+        text-transform: uppercase;
+        font-weight: 600;
+        transition: background-color 0.3s ease;
+        text-align: center;
+    }
+    .nav-button-primary {
+        background-color: #FEC200; 
+        color: #212529;
+    }
+    .nav-button-primary:hover {
+        background-color: #e0a800; 
+    }
+    .nav-button-secondary {
+        background-color: #94BDDD; 
+        color: white;
+    }
+    .nav-button-secondary:hover {
+        background-color: #6a8eaa; 
+    }
+    .level-badge {
+        display: inline-block;
+        padding: 0.25em 0.6em;
+        font-size: .75em;
+        font-weight: 700;
+        line-height: 1;
+        text-align: center;
+        white-space: nowrap;
+        vertical-align: baseline;
+        border-radius: .25rem;
+        color: #fff;
+    }
+    .practice-section {
+        margin-bottom: 2rem;
+        border: 1px solid #e5e7eb;
+        border-radius: 0.5rem;
+        overflow: hidden;
+    }
+    .practice-section-header {
+        padding: 1rem 1.5rem;
+        font-weight: 600;
+        font-size: 1.125rem;
+        color: white;
+    }
+    .practice-section-content {
+        padding: 1.5rem;
+        background-color: #ffffff;
+    }
+    .level-reproductive {
+        background-color: #28a745;
+    }
+    .level-constructive {
+        background-color: #ffc107;
+        color: #212529;
+    }
+    .level-creative {
+        background-color: #dc3545;
+    }
+</style>
+@endpush
+
+@section('content')
+{{-- Заголовок блока с фоном --}}
+<div class="flex flex-col items-center justify-center border-b border-yellow-500">
+    <div class="container flex flex-col md:flex-row mx-auto lg:px-8 px-4">
+        <div class="w-3/4 flex flex-col justify-center">
+            <h1 class="text-4xl font-bold mb-4 text-[#28569A]">Практичні завдання</h1>
+            <h2 class="text-2xl font-semibold mb-2 text-gray-700">{{ $subsection->section->order }}.{{ $subsection->order }} {{ $subsection->title }}</h2>
+        </div>
+        <div class="w-1/4 flex flex-col items-center justify-center">
+            <div class="flex flex-col items-center justify-center">
+                <img src="{{ asset('storage/header-1.png') }}" alt="Section 1" class="w-full h-auto">
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    {{-- Хлебные крошки --}}
+    <nav class="mb-6 text-sm text-gray-500" aria-label="Breadcrumb">
+        <ol class="list-none p-0 inline-flex space-x-2">
+            <li><a href="{{ route('home') }}" class="text-[#3A6EA5] hover:underline">Головна</a></li>
+            <li><span>/</span></li>
+            <li><a href="{{ route('sections.index') }}" class="text-[#3A6EA5] hover:underline">Зміст</a></li>
+            <li><span>/</span></li>
+            <li><a href="{{ route('sections.show', $subsection->section) }}" class="text-[#3A6EA5] hover:underline">{{ $subsection->section->title }}</a></li>
+            <li><span>/</span></li>
+            <li><a href="{{ route('subsections.show', $subsection) }}" class="text-[#3A6EA5] hover:underline">{{ $subsection->title }}</a></li>
+            <li><span>/</span></li>
+            <li class="text-gray-700" aria-current="page">Практичні роботи ({{ $subsection->section->order }}.{{ $subsection->order }})</li>
+        </ol>
+    </nav>   
+
+    <main>
+        @if($practiceBlocks->isNotEmpty())
+            {{-- Репродуктивный уровень --}}
+            @if($practiceBlocks->has('reproductive'))
+                <div class="practice-section" id="level-reproductive">
+                    <div class="practice-section-header level-reproductive">
+                        <h2 class="text-xl font-bold">Репродуктивний рівень</h2>
+                        <p class="text-sm opacity-90 mt-1">Завдання на відтворення та застосування вивченого матеріалу</p>
+                    </div>
+                    <div class="practice-section-content">
+                                                 @foreach($practiceBlocks['reproductive'] as $practiceBlock)
+                             <div class="mb-6 last:mb-0" id="practice-block-{{ $practiceBlock->id }}">
+                                 <h3 class="text-lg font-semibold mb-3 text-gray-800">
+                                     Практична робота №{{ $practiceBlock->order }} ({{ $subsection->section->order }}.{{ $subsection->order }})
+                                 </h3>
+                                 @if($practiceBlock->elements->isNotEmpty())
+                                    @foreach($practiceBlock->elements as $element)
+                                        @include('pages.subsections._block_element', ['element' => $element])
+                                    @endforeach
+                                @else
+                                    <p class="text-gray-600">Практична робота ще не додана.</p>
+                                @endif
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
+
+            {{-- Конструктивный уровень --}}
+            @if($practiceBlocks->has('constructive'))
+                <div class="practice-section" id="level-constructive">
+                    <div class="practice-section-header level-constructive">
+                        <h2 class="text-xl font-bold">Конструктивний рівень</h2>
+                        <p class="text-sm opacity-90 mt-1">Завдання на конструювання та створення нових рішень</p>
+                    </div>
+                    <div class="practice-section-content">
+                                                 @foreach($practiceBlocks['constructive'] as $practiceBlock)
+                             <div class="mb-6 last:mb-0" id="practice-block-{{ $practiceBlock->id }}">
+                                 <h3 class="text-lg font-semibold mb-3 text-gray-800">
+                                     Практична робота №{{ $practiceBlock->order }} ({{ $subsection->section->order }}.{{ $subsection->order }})
+                                 </h3>
+                                 @if($practiceBlock->elements->isNotEmpty())
+                                    @foreach($practiceBlock->elements as $element)
+                                        @include('pages.subsections._block_element', ['element' => $element])
+                                    @endforeach
+                                @else
+                                    <p class="text-gray-600">Практична робота ще не додана.</p>
+                                @endif
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
+
+                         {{-- Творческий уровень --}}
+             @if($practiceBlocks->has('creative'))
+                 <div class="practice-section" id="level-creative">
+                     <div class="practice-section-header level-creative">
+                         <h2 class="text-xl font-bold">Творчий рівень</h2>
+                         <p class="text-sm opacity-90 mt-1">Завдання на творче застосування знань та створення оригінальних рішень</p>
+                     </div>
+                     <div class="practice-section-content">
+                         @foreach($practiceBlocks['creative'] as $practiceBlock)
+                             <div class="mb-6 last:mb-0" id="practice-block-{{ $practiceBlock->id }}">
+                                 <h3 class="text-lg font-semibold mb-3 text-gray-800">
+                                     Практична робота №{{ $practiceBlock->order }} ({{ $subsection->section->order }}.{{ $subsection->order }})
+                                 </h3>
+                                 @if($practiceBlock->elements->isNotEmpty())
+                                     @foreach($practiceBlock->elements as $element)
+                                         @include('pages.subsections._block_element', ['element' => $element])
+                                     @endforeach
+                                 @else
+                                     <p class="text-gray-600">Практична робота ще не додана.</p>
+                                 @endif
+                             </div>
+                         @endforeach
+                     </div>
+                 </div>
+             @endif
+        @else
+            <div class="content-card">
+                <p class="text-gray-600">Практичні роботи ще не додані до цього підрозділу.</p>
+            </div>
+        @endif
+    </main>
+
+    <div class="mt-8 flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0 sm:space-x-4">
+        <a href="{{ route('subsections.show', $subsection) }}" class="nav-button nav-button-secondary w-full sm:w-auto">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
+            До підрозділу
+        </a>
+        
+        <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 w-full sm:w-auto">
+            @if($subsection->homeworkBlock)
+                <a href="{{ route('blocks.homework.show', $subsection) }}" class="nav-button nav-button-primary w-full sm:w-auto">
+                    Самостійна робота
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block ml-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" /></svg>
+                </a>
+            @elseif($subsection->controlBlocks()->exists())
+                 <a href="{{ route('blocks.control.show', [$subsection, $subsection->controlBlocks()->orderBy('order')->first()]) }}" class="nav-button nav-button-primary w-full sm:w-auto">
+                    Засоби перевірки
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block ml-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" /></svg>
+                </a>
+            @endif
+            <a href="{{ route('sections.index') }}" class="nav-button nav-button-secondary w-full sm:w-auto">Зміст</a>
+        </div>
+    </div>
+</div>
+
+@if($targetBlockId)
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const targetElement = document.getElementById('practice-block-{{ $targetBlockId }}');
+    if (targetElement) {
+        targetElement.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'start' 
+        });
+        
+        // Добавляем подсветку для привлечения внимания
+        targetElement.style.backgroundColor = '#fef3c7';
+        targetElement.style.transition = 'background-color 0.3s ease';
+        
+        setTimeout(() => {
+            targetElement.style.backgroundColor = '';
+        }, 2000);
+    }
+});
+</script>
+@endif
+@endsection 

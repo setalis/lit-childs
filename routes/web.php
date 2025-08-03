@@ -29,8 +29,10 @@ Route::get('/sections/{section}', [SectionController::class, 'show'])->name('sec
 Route::get('/subsections/{subsection}', [SubsectionController::class, 'show'])->name('subsections.show');
 
 Route::get('/subsections/{subsection}/theory', [BlockDisplayController::class, 'showTheory'])->name('blocks.theory.show');
+Route::get('/subsections/{subsection}/practice', [BlockDisplayController::class, 'showAllPractice'])->name('blocks.practice.all');
 Route::get('/subsections/{subsection}/practice/{practiceBlock}', [BlockDisplayController::class, 'showPractice'])->name('blocks.practice.show');
 Route::get('/subsections/{subsection}/homework', [BlockDisplayController::class, 'showHomework'])->name('blocks.homework.show');
+Route::get('/subsections/{subsection}/control', [BlockDisplayController::class, 'showAllControl'])->name('blocks.control.all');
 Route::get('/subsections/{subsection}/control/{controlBlock}', [ControlBlockController::class, 'show'])->name('blocks.control.show');
 
 Route::get('/dictionary', [DictionaryController::class, 'index'])->name('dictionary.index');
@@ -96,6 +98,14 @@ Route::get('test/flexible-links', function () {
 Route::get('test/simple', function () {
     return view('pages.test.simple-test');
 })->name('test.simple');
+
+Route::get('test/terms', function () {
+    return view('pages.test.terms-test');
+})->name('test.terms');
+
+Route::get('test/links-styling', function () {
+    return view('pages.test.links-styling-test');
+})->name('test.links-styling');
 
 Route::get('shablon/dictionary', function () {
     return view('pages.shablon.dictionary');
