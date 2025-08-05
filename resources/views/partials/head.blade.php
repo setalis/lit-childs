@@ -12,10 +12,6 @@
 
 @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-{{-- TinyMCE Editor --}}
-<script src="{{ asset('js/tinymce/tinymce.min.js') }}" referrerpolicy="origin"></script>
-<script>
-    console.log('TinyMCE загружен в админке:', typeof tinymce !== 'undefined');
-</script>
+{{-- TinyMCE Editor - ПЕРЕМЕЩЕН В КОНЕЦ ДОКУМЕНТА --}}
 
 @fluxAppearance

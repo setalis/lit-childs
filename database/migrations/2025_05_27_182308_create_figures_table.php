@@ -13,12 +13,14 @@ return new class extends Migration
     {
         Schema::create('figures', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->index();
             $table->string('first_name')->nullable();
-            $table->string('last_name')->nullable();
+            $table->string('last_name')->nullable()->index();
             $table->text('biography');
+            $table->text('sources')->nullable();
+            $table->text('biography_2')->nullable();
+            $table->text('sources_2')->nullable();
             $table->string('image_path')->nullable();
-            $table->char('first_letter', 1)->virtualAs('SUBSTRING(COALESCE(NULLIF(last_name, ""), name), 1, 1)')->index();
+            $table->char('first_letter', 1)->virtualAs('UPPER(SUBSTRING(last_name, 1, 1))')->index();
             $table->timestamps();
         });
     }

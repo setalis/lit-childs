@@ -9,11 +9,6 @@
     {{-- Подключение Vite для Tailwind CSS --}}
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-    {{-- TinyMCE Editor --}}
-    <script src="{{ asset('js/tinymce/tinymce.min.js') }}" referrerpolicy="origin"></script>
-    <script>
-        console.log('TinyMCE загружен:', typeof tinymce !== 'undefined');
-    </script>
 
     {{-- Дополнительные стили, если нужны --}}
     @stack('styles')
@@ -173,9 +168,9 @@
                 </div>
                 <nav class="hidden md:flex space-x-6 lg:space-x-8 ">
                     <a href="{{ route('sections.index') }}" class="text-gray-700 hover:text-[#3A6EA5] px-3 py-2 rounded-md text-sm font-medium">ЗМІСТ</a>
-                    <a href="{{ route('dictionary.index') }}" class="text-gray-700 hover:text-[#3A6EA5] px-3 py-2 rounded-md text-sm font-medium">СЛОВНИК ДОВІДНИК</a>
+                    <!-- <a href="{{ route('dictionary.index') }}" class="text-gray-700 hover:text-[#3A6EA5] px-3 py-2 rounded-md text-sm font-medium">СЛОВНИК ДОВІДНИК</a> -->
                     <a href="{{ route('figures.index') }}" class="text-gray-700 hover:text-[#3A6EA5] px-3 py-2 rounded-md text-sm font-medium">ПЕРСОНАЛІЇ</a>
-                <a href="{{ route('terms.index') }}" class="text-gray-700 hover:text-[#3A6EA5] px-3 py-2 rounded-md text-sm font-medium">СЛОВНИК</a>
+                    <a href="{{ route('terms.index') }}" class="text-gray-700 hover:text-[#3A6EA5] px-3 py-2 rounded-md text-sm font-medium">СЛОВНИК-ДОВІДНИК</a>
                     <a href="#" class="text-gray-700 hover:text-[#3A6EA5] px-3 py-2 rounded-md text-sm font-medium">МЕДІА КОНТЕНТ</a>
                     <a href="#" class="text-gray-700 hover:text-[#3A6EA5] px-3 py-2 rounded-md text-sm font-medium">РЕКОМЕНДОВАНА ЛІТЕРАТУРА</a>
                 </nav>
@@ -264,6 +259,13 @@
     </footer>
 
     @stack('scripts')
+    
+    {{-- TinyMCE Editor - ЗАГРУЖАЕТСЯ В КОНЦЕ ДОКУМЕНТА --}}
+    <script src="{{ asset('js/tinymce/tinymce.min.js') }}" referrerpolicy="origin"></script>
+    <script>
+        console.log('TinyMCE загружен в конце документа:', typeof tinymce !== 'undefined');
+    </script>
+    
     <script>
         // Простой скрипт для мобильного меню, если не используется Alpine.js или подобное
         // document.addEventListener('DOMContentLoaded', function () {

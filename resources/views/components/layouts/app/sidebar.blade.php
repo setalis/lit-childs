@@ -133,5 +133,12 @@
         {{ $slot }}
 
         @fluxScripts
+        
+        {{-- TinyMCE Editor --}}
+        <script src="{{ asset('js/tinymce/tinymce.min.js') }}" referrerpolicy="origin"></script>
+        <script>
+            console.log('TinyMCE загружен в sidebar layout:', typeof tinymce !== 'undefined');
+        </script>
+        
     </body>
 </html>

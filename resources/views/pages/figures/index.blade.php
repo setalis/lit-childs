@@ -38,7 +38,7 @@
                         @if($figure->image_path)
                             <div class="w-full h-48 overflow-hidden">
                                 <img src="{{ asset('storage/' . $figure->image_path) }}" 
-                                     alt="{{ $figure->name }}" 
+                                     alt="{{ $figure->display_name }}" 
                                      class="w-full h-full object-cover">
                             </div>
                         @else
@@ -58,7 +58,11 @@
                             
                             {{-- Краткое описание --}}
                             <p class="text-gray-600 text-sm mb-4 leading-relaxed">
-                                {!! process_figure_links(Str::limit($figure->biography, 120)) !!}
+                                @if($figure->biography)
+                                    {!! process_figure_links(Str::limit($figure->biography, 120)) !!}
+                                @else
+                                    <span class="text-gray-400">Опис відсутній</span>
+                                @endif
                             </p>
                             
                             {{-- Кнопка "Докладніше" --}}

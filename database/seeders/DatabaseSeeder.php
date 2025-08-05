@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
         // ]);
 
         $this->call([
+            UserSeeder::class,
             SectionSeeder::class,
             SubsectionSeeder::class,
             ContentBlockSeeder::class,

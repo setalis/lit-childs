@@ -15,25 +15,40 @@ class FigureController extends Controller
     {
         $selectedLetter = $request->get('letter');
 
-        $query = Figure::orderBy('last_name')->orderBy('first_name');
+        // Получаем все персоналии
+        $allFigures = Figure::orderBy('last_name')->orderBy('first_name')->get();
 
+        // Группируем по первой букве используя PHP
+        $figures = $allFigures->groupBy(function($figure) {
+            // Получаем первую букву фамилии в верхнем регистре
+            return mb_strtoupper(mb_substr($figure->last_name, 0, 1, 'UTF-8'), 'UTF-8');
+        });
+
+        // Если выбрана определенная буква, фильтруем
         if ($selectedLetter) {
-            $query->where('first_letter', $selectedLetter);
+            $figures = $figures->filter(function($group, $letter) use ($selectedLetter) {
+                return $letter === $selectedLetter;
+            });
         }
 
-        $figures = $query->get()->groupBy('first_letter');
+        // Сортируем группы по алфавиту
+        $figures = $figures->sortKeys();
 
-        $letters = Figure::select('first_letter')
-                        ->distinct()
-                        ->orderBy('first_letter')
-                        ->pluck('first_letter')
-                        ->filter(); // Убираем пустые значения
+        // Получаем все уникальные буквы для навигации
+        $letters = $allFigures->map(function($figure) {
+            return mb_strtoupper(mb_substr($figure->last_name, 0, 1, 'UTF-8'), 'UTF-8');
+        })->unique()->sort()->values();
 
         return view('pages.figures.index', compact('figures', 'letters', 'selectedLetter'));
     }
 
     public function show(Figure $figure): View
     {
+        // Загружаем блоки с сортировкой по порядку
+        $figure->load(['blocks' => function($query) {
+            $query->orderBy('order');
+        }]);
+        
         return view('pages.figures.show', compact('figure'));
     }
 
@@ -48,18 +63,39 @@ class FigureController extends Controller
             'first_name' => 'nullable|string|max:255',
             'last_name' => 'required|string|max:255',
             'biography' => 'required|string',
+            'sources' => 'required|string',
+            'biography_2' => 'nullable|string',
+            'sources_2' => 'nullable|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'blocks' => 'nullable|array',
+            'blocks.*.type' => 'required|in:biography,sources',
+            'blocks.*.content' => 'required|string|min:10',
+            'blocks.*.order' => 'nullable|integer|min:0',
         ]);
 
-        // Создаем полное имя для обратной совместимости
-        $validated['name'] = trim(($validated['first_name'] ?? '') . ' ' . $validated['last_name']);
+        // Убираем обратную совместимость с полем name
 
         if ($request->hasFile('image')) {
             $path = $request->file('image')->store('figures', 'public');
             $validated['image_path'] = $path;
         }
 
-        Figure::create($validated);
+        // Создаем персоналию
+        $figure = Figure::create($validated);
+
+        // Создаем блоки
+        if (isset($validated['blocks'])) {
+            foreach ($validated['blocks'] as $blockKey => $blockData) {
+                // Обрабатываем блоки с ID вида biography_X или source_X
+                if (preg_match('/^(biography|source)_\d+$/', $blockKey)) {
+                    $figure->blocks()->create([
+                        'type' => $blockData['type'],
+                        'content' => $blockData['content'],
+                        'order' => $blockData['order'] ?? 0,
+                    ]);
+                }
+            }
+        }
 
         // Обновляем кеш персоналий для автоматических ссылок
         app(\App\Services\FigureLinkService::class)->refreshFigures();
@@ -69,6 +105,11 @@ class FigureController extends Controller
 
     public function edit(Figure $figure): View
     {
+        // Загружаем блоки с сортировкой по порядку
+        $figure->load(['blocks' => function($query) {
+            $query->orderBy('order');
+        }]);
+        
         return view('admin.figures.edit', compact('figure'));
     }
 
@@ -78,7 +119,14 @@ class FigureController extends Controller
             'first_name' => 'nullable|string|max:255',
             'last_name' => 'required|string|max:255',
             'biography' => 'required|string',
+            'sources' => 'required|string',
+            'biography_2' => 'nullable|string',
+            'sources_2' => 'nullable|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'blocks' => 'nullable|array',
+            'blocks.*.type' => 'required|in:biography,sources',
+            'blocks.*.content' => 'required|string|min:10',
+            'blocks.*.order' => 'nullable|integer|min:0',
         ]);
 
         // Обновляем полное имя для обратной совместимости
@@ -95,6 +143,45 @@ class FigureController extends Controller
         }
 
         $figure->update($validated);
+
+        // Обновляем блоки
+        if (isset($validated['blocks'])) {
+            // Получаем ID существующих блоков
+            $existingBlockIds = $figure->blocks->pluck('id')->toArray();
+            $updatedBlockIds = [];
+            
+            foreach ($validated['blocks'] as $blockKey => $blockData) {
+                // Если это существующий блок (есть ID)
+                if (isset($blockData['id']) && is_numeric($blockData['id'])) {
+                    $block = $figure->blocks()->find($blockData['id']);
+                    if ($block) {
+                        $block->update([
+                            'type' => $blockData['type'],
+                            'content' => $blockData['content'],
+                            'order' => $blockData['order'] ?? 0,
+                        ]);
+                        $updatedBlockIds[] = $block->id;
+                    }
+                } elseif (preg_match('/^(biography|source)_\d+$/', $blockKey)) {
+                    // Это новый блок с ID вида biography_X или source_X
+                    $newBlock = $figure->blocks()->create([
+                        'type' => $blockData['type'],
+                        'content' => $blockData['content'],
+                        'order' => $blockData['order'] ?? 0,
+                    ]);
+                    $updatedBlockIds[] = $newBlock->id;
+                }
+            }
+            
+            // Удаляем блоки, которые не были обновлены
+            $blocksToDelete = array_diff($existingBlockIds, $updatedBlockIds);
+            if (!empty($blocksToDelete)) {
+                $figure->blocks()->whereIn('id', $blocksToDelete)->delete();
+            }
+        } else {
+            // Если блоков нет, удаляем все существующие
+            $figure->blocks()->delete();
+        }
 
         // Обновляем кеш персоналий для автоматических ссылок
         app(\App\Services\FigureLinkService::class)->refreshFigures();

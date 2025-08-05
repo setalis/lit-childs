@@ -10,6 +10,17 @@ use Illuminate\View\View;
 class ControlBlockController extends Controller
 {
     /**
+     * Display all control blocks for subsection.
+     */
+    public function showAll(Subsection $subsection): View
+    {
+        // Завантажуємо необхідні дані
+        $subsection->load(['section', 'controlBlocks.elements', 'controlBlocks.test.questions.answers', 'controlBlocks.test.questions.matchPairs']);
+
+        return view('pages.blocks.control_all_show', compact('subsection'));
+    }
+
+    /**
      * Display the specified control block.
      */
     public function show(Subsection $subsection, ControlBlock $controlBlock): View

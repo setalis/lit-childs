@@ -3,8 +3,8 @@
 @section('title', $subsection->title . ' - Schoolbook')
 
 @section('content')
-<div class="flex flex-col items-center justify-center border-b border-yellow-500 mb-8">
-    <div class="container flex flex-col md:flex-row mx-auto lg:px-8 px-4 py-8">
+<div class="flex flex-col items-center justify-center border-b border-yellow-500">
+    <div class="container flex flex-col md:flex-row mx-auto lg:px-8 px-4">
         <div class="w-3/4 flex flex-col justify-center">
             <h1 class="text-4xl font-bold mb-4 uppercase text-[#28569A]">Розділ {{ $subsection->order }}</h1>
             <h2 class="text-3xl font-bold mb-4 uppercase">{{ $subsection->title }}</h2>
@@ -17,9 +17,9 @@
     </div>
 </div>
 
-<div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+<div class="container mx-auto px-4 sm:px-6 lg:px-8 pb-8 pt-4">
     {{-- Хлебные крошки --}}
-    <nav class="mb-6 text-sm text-gray-500" aria-label="Breadcrumb">
+    <nav class="mb-16 text-sm text-gray-500" aria-label="Breadcrumb">
         <ol class="list-none p-0 inline-flex space-x-2">
             <li><a href="{{ route('home') }}" class="text-[#3A6EA5] hover:underline">Головна</a></li>
             <li><span>/</span></li>
@@ -89,6 +89,7 @@
 
         {{-- Контроль знаний --}}
         @if($subsection->controlBlocks->isNotEmpty())
+        <a href="{{ route('blocks.control.all', $subsection) }}" class="nav-card-button button-control">
             <div class="nav-card-button button-control">
                 <div class="flex items-center justify-center w-12 h-12 bg-red-500 rounded-lg mb-4">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#fff" class="bi bi-card-checklist" viewBox="0 0 16 16">
@@ -99,6 +100,7 @@
                 <h3 class="text-lg font-semibold mb-2">Засоби перевірки</h3>
                 <p class="text-sm text-gray-600">{{ $subsection->controlBlocks->count() }} блоків</p>
             </div>
+        </a>
         @else
             <div class="nav-card-button button-control opacity-50 cursor-not-allowed">Засоби перевірки (немає)</div>
         @endif
@@ -166,7 +168,14 @@
     {{-- Задания для самостоятельной работы --}}
     @if($subsection->homeworkBlock && $subsection->homeworkBlock->elements->isNotEmpty())
         <div class="mb-8 p-6 bg-white shadow-lg rounded-lg">
-            <h2 class="text-2xl font-semibold mb-4 text-purple-700">Завдання для самостійної роботи</h2>
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-2xl font-semibold mb-4 text-purple-700">Завдання для самостійної роботи</h2>
+                <a href="{{ route('blocks.homework.show', $subsection) }}" 
+                   class="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors text-sm">
+                    Переглянути всі
+                </a>
+            </div>
+            
             @foreach($subsection->homeworkBlock->elements as $element)
                 @include('pages.subsections._block_element', ['element' => $element])
             @endforeach

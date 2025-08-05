@@ -1,6 +1,19 @@
 <x-layouts.app title="Додати персоналію">
-<div class="container mx-auto px-4 py-8">
-    <div class="max-w-2xl mx-auto">
+
+<style>
+/* Скрываем только проблемные элементы TinyMCE, но не диалоговые окна */
+.tox-silver-sink {
+    position: fixed !important;
+    z-index: 9999 !important;
+}
+.tox-tinymce-aux {
+    position: fixed !important;
+    z-index: 9999 !important;
+}
+</style>
+
+<div class="container w-full mx-auto px-4 py-8">
+    <div class="max-w-5xl mx-auto">
         <div class="flex items-center mb-6">
             <a href="{{ route('admin.figures.index') }}" 
                class="text-blue-500 hover:text-blue-700 mr-4"
@@ -13,77 +26,122 @@
         </div>
 
         <div class="bg-white shadow-lg rounded-lg p-6">
-            <form action="{{ route('admin.figures.store') }}" method="POST" enctype="multipart/form-data">
+            <form action="{{ route('admin.figures.store') }}" method="POST" enctype="multipart/form-data" id="figureForm">
                 @csrf
 
-                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                     <div>
-                         <label for="first_name" class="block text-sm font-medium text-gray-700 mb-2">
-                             Ім'я
-                         </label>
-                         <input type="text" 
-                                name="first_name" 
-                                id="first_name" 
-                                value="{{ old('first_name') }}"
-                                class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 @error('first_name') border-red-500 @enderror">
-                         @error('first_name')
-                             <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                         @enderror
-                     </div>
-                     
-                     <div>
-                         <label for="last_name" class="block text-sm font-medium text-gray-700 mb-2">
-                             Прізвище *
-                         </label>
-                         <input type="text" 
-                                name="last_name" 
-                                id="last_name" 
-                                value="{{ old('last_name') }}"
-                                class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 @error('last_name') border-red-500 @enderror"
-                                required>
-                         @error('last_name')
-                             <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                         @enderror
-                     </div>
-                 </div>
+                {{-- Основная информация --}}
+                <div class="mb-8">
+                    <h2 class="text-xl font-semibold text-gray-900 mb-4 border-b border-gray-200 pb-2">Основна інформація</h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label for="first_name" class="block text-sm font-medium text-gray-700 mb-2">
+                                Ім'я
+                            </label>
+                            <input type="text" 
+                                   name="first_name" 
+                                   id="first_name" 
+                                   value="{{ old('first_name') }}"
+                                   class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            @error('first_name')
+                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+                        
+                        <div>
+                            <label for="last_name" class="block text-sm font-medium text-gray-700 mb-2">
+                                Прізвище *
+                            </label>
+                            <input type="text" 
+                                   name="last_name" 
+                                   id="last_name" 
+                                   value="{{ old('last_name') }}"
+                                   class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                   required>
+                            @error('last_name')
+                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
 
-                <div class="mb-4">
-                    <label for="image" class="block text-sm font-medium text-gray-700 mb-2">
-                        Фотографія
-                    </label>
-                    <input type="file" 
-                           name="image" 
-                           id="image" 
-                           accept="image/*"
-                           class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 @error('image') border-red-500 @enderror">
-                    @error('image')
-                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                    @enderror
-                    <p class="text-gray-500 text-sm mt-1">Поддерживаемые форматы: JPEG, PNG, JPG, GIF. Максимальный размер: 2MB</p>
+                    <div class="mb-4">
+                        <label for="image" class="block text-sm font-medium text-gray-700 mb-2">
+                            Фотографія
+                        </label>
+                        <input type="file" 
+                               name="image" 
+                               id="image" 
+                               accept="image/*"
+                               class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        @error('image')
+                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                        <p class="text-gray-500 text-sm mt-1">Поддерживаемые форматы: JPEG, PNG, JPG, GIF. Максимальный размер: 2MB</p>
+                    </div>
                 </div>
 
-                <div class="mb-6">
-                    <label for="biography" class="block text-sm font-medium text-gray-700 mb-2">
-                        Біографія *
-                    </label>
-                    <textarea name="biography" 
-                              id="biography" 
-                              rows="10"
-                              class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 @error('biography') border-red-500 @enderror"
-                              required>{{ old('biography') }}</textarea>
-                    @error('biography')
-                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                    @enderror
+                {{-- Основные поля с редактором --}}
+                <div class="mb-8">
+                    <h2 class="text-xl font-semibold text-gray-900 mb-4 border-b border-gray-200 pb-2">Основні поля</h2>
+                    
+                    <div class="mb-6">
+                        <label for="biography" class="block text-sm font-medium text-gray-700 mb-2">
+                            Основна біографія *
+                        </label>
+                        <textarea name="biography" id="biography" class="w-full border border-gray-300 rounded-md" required>{{ old('biography') }}</textarea>
+                        @error('biography')
+                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                        <p class="text-gray-500 text-sm mt-1">Короткий опис для карточки персоналии</p>
+                    </div>
+
+                    <div class="mb-6">
+                        <label for="sources" class="block text-sm font-medium text-gray-700 mb-2">
+                            Основні джерела *
+                        </label>
+                        <textarea name="sources" id="sources" class="w-full border border-gray-300 rounded-md" required>{{ old('sources') }}</textarea>
+                        @error('sources')
+                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                        <p class="text-gray-500 text-sm mt-1">Основні джерела інформації</p>
+                    </div>
                 </div>
 
-                <div class="flex justify-end space-x-4">
-                                         <a href="{{ route('admin.figures.index') }}" 
-                        class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors"
-                        wire:navigate>
-                         Скасувати
-                     </a>
+                {{-- Дополнительные поля с редактором --}}
+                <div class="mb-8">
+                    <h2 class="text-xl font-semibold text-gray-900 mb-4 border-b border-gray-200 pb-2">Додаткові поля</h2>
+                    
+                    <div class="mb-6">
+                        <label for="biography_2" class="block text-sm font-medium text-gray-700 mb-2">
+                            Додаткова біографія
+                        </label>
+                        <textarea name="biography_2" id="biography_2" class="w-full border border-gray-300 rounded-md">{{ old('biography_2') }}</textarea>
+                        @error('biography_2')
+                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                        <p class="text-gray-500 text-sm mt-1">Додаткова інформація про персоналію</p>
+                    </div>
+
+                    <div class="mb-6">
+                        <label for="sources_2" class="block text-sm font-medium text-gray-700 mb-2">
+                            Додаткові джерела
+                        </label>
+                        <textarea name="sources_2" id="sources_2" class="w-full border border-gray-300 rounded-md">{{ old('sources_2') }}</textarea>
+                        @error('sources_2')
+                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                        <p class="text-gray-500 text-sm mt-1">Додаткові джерела інформації</p>
+                    </div>
+                </div>
+
+                <div class="flex justify-end gap-4">
+                    <a href="{{ route('admin.figures.index') }}" 
+                       class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+                       wire:navigate>
+                        Скасувати
+                    </a>
                     <button type="submit" 
-                            class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors">
+                            class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
                         Зберегти
                     </button>
                 </div>
@@ -91,4 +149,49 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Ждем загрузки TinyMCE
+    const waitForTinyMCE = setInterval(function() {
+        if (typeof tinymce !== 'undefined') {
+            clearInterval(waitForTinyMCE);
+            console.log('TinyMCE доступен, инициализируем редакторы');
+            initTinyMCE();
+        }
+    }, 100);
+    
+    // Таймаут на случай, если TinyMCE не загрузится
+    setTimeout(function() {
+        clearInterval(waitForTinyMCE);
+        if (typeof tinymce === 'undefined') {
+            console.error('TinyMCE не загрузился в течение 5 секунд');
+        }
+    }, 5000);
+    
+    function initTinyMCE() {
+        // Инициализация TinyMCE для всех полей с базовыми плагинами
+        const editors = ['biography', 'sources', 'biography_2', 'sources_2'];
+        
+        editors.forEach(function(editorId) {
+            tinymce.init({
+                selector: '#' + editorId,
+                height: 300,
+                plugins: 'lists link code',
+                toolbar: 'bold italic | bullist numlist | link | code',
+                menubar: false,
+                statusbar: false,
+                branding: false,
+                resize: false,
+                setup: function(editor) {
+                    editor.on('change', function() {
+                        editor.save();
+                    });
+                }
+            });
+        });
+    }
+});
+</script>
+
 </x-layouts.app> 

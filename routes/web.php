@@ -32,7 +32,7 @@ Route::get('/subsections/{subsection}/theory', [BlockDisplayController::class, '
 Route::get('/subsections/{subsection}/practice', [BlockDisplayController::class, 'showAllPractice'])->name('blocks.practice.all');
 Route::get('/subsections/{subsection}/practice/{practiceBlock}', [BlockDisplayController::class, 'showPractice'])->name('blocks.practice.show');
 Route::get('/subsections/{subsection}/homework', [BlockDisplayController::class, 'showHomework'])->name('blocks.homework.show');
-Route::get('/subsections/{subsection}/control', [BlockDisplayController::class, 'showAllControl'])->name('blocks.control.all');
+Route::get('/subsections/{subsection}/control', [ControlBlockController::class, 'showAll'])->name('blocks.control.all');
 Route::get('/subsections/{subsection}/control/{controlBlock}', [ControlBlockController::class, 'show'])->name('blocks.control.show');
 
 Route::get('/dictionary', [DictionaryController::class, 'index'])->name('dictionary.index');

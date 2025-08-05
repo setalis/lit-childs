@@ -13,7 +13,7 @@ class FigureLinkService
     
     public function __construct()
     {
-        $this->figures = Figure::all(['id', 'name', 'first_name', 'last_name']);
+        $this->figures = Figure::all(['id', 'first_name', 'last_name']);
         $this->terms = Term::all(['id', 'name']);
     }
 
@@ -180,8 +180,8 @@ class FigureLinkService
         if (!$this->figures->isEmpty()) {
             foreach ($this->figures as $figure) {
                 // Ищем по фамилии
-                $lastName = $figure->last_name ?: explode(' ', $figure->name)[count(explode(' ', $figure->name)) - 1];
-                $fullName = $figure->display_name ?: $figure->name;
+                $lastName = $figure->last_name;
+                $fullName = $figure->display_name;
                 
                 if (!empty($lastName)) {
                     // Создаем гибкий паттерн для поиска
@@ -281,8 +281,8 @@ class FigureLinkService
         if (!$this->figures->isEmpty()) {
             foreach ($this->figures as $figure) {
                 // Ищем по фамилии
-                $lastName = $figure->last_name ?: explode(' ', $figure->name)[count(explode(' ', $figure->name)) - 1];
-                $fullName = $figure->display_name ?: $figure->name;
+                $lastName = $figure->last_name;
+                $fullName = $figure->display_name;
                 
                 if (!empty($lastName)) {
                     // Разбиваем текст на части: текст вне тегов и сами теги
@@ -412,7 +412,7 @@ class FigureLinkService
      */
     public function refreshFigures(): void
     {
-        $this->figures = Figure::all(['id', 'name', 'first_name', 'last_name']);
+        $this->figures = Figure::all(['id', 'first_name', 'last_name']);
     }
 
     /**
