@@ -26,33 +26,6 @@ class BlockElement extends Model
         return $this->morphTo();
     }
 
-    // Можно добавить accessor для content, чтобы автоматически декодировать JSON, если нужно
-    // public function getContentAttribute($value)
-    // {
-    //     if (in_array($this->element_type, ['keywords', 'image', 'gallery', 'button_group'])) {
-    //         return json_decode($value, true);
-    //     }
-    //     return $value;
-    // }
-
-    /**
-     * Get the displayable name for the element type.
-     *
-     * @return string
-     */
-    public function getElementTypeDisplayAttribute(): string
-    {
-        return match ($this->element_type) {
-            'text' => 'Текст',
-            'keywords' => 'Ключові слова',
-            'list' => 'Список',
-            'image' => 'Зображення',
-            'gallery' => 'Галерея',
-            'button_group' => 'Група кнопок',
-            default => ucfirst($this->element_type),
-        };
-    }
-
     /**
      * Получает контент с обработанными ссылками на персоналии
      *
@@ -64,18 +37,21 @@ class BlockElement extends Model
     }
 
     /**
-     * Получает обработанные ключевые слова с автоматическими ссылками
+     * Получает ключевые слова с обработанными ссылками на термины
      *
-     * @return array
+     * @return array|null
      */
-    public function getProcessedKeywordsAttribute(): array
+    public function getProcessedKeywordsAttribute(): ?array
     {
-        if ($this->element_type !== 'keywords' || empty($this->content)) {
-            return [];
+        if ($this->element_type !== 'keywords') {
+            return null;
         }
 
-        $keywords = array_map('trim', explode(',', $this->content));
-        $keywords = array_filter($keywords);
+        // Декодируем JSON для ключевых слов
+        $keywords = json_decode($this->content, true);
+        if (!is_array($keywords)) {
+            return null;
+        }
 
         return array_map(function($keyword) {
             return process_figure_links($keyword, true);

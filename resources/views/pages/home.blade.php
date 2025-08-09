@@ -42,7 +42,7 @@
 
 @section('content')
     {{-- Hero Section --}}
-    <section class="hero-bg flex items-center h-[800px] -my-20 border-b border-yellow-300">
+    <section class="hero-bg flex items-center h-full lg:py-38 py-24 -mt-16 border-b border-yellow-300">
         <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center md:text-left }}')]">
             <div class="md:w-2/3 lg:w-2/3">
                 <h3 class="text-lg sm:text-lg mb-4 leading-tight font-bold text-[#94BDDD] uppercase">Інна Хижняк,  Ольга Хващевська, Ірина Лобачова</h3>
@@ -55,7 +55,7 @@
     </section>
 
     {{-- Sections Overview --}}
-    <section class="mt-24 py-16">
+    <section class="mt-24 ">
         <div class="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <h2 class="text-5xl font-bold text-center mb-12 text-[#3A6EA5]">РОЗДІЛИ ПІДРУЧНИКА</h2>
             @if($sections->isEmpty())

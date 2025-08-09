@@ -54,7 +54,9 @@ class TermController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'definition' => 'required|string',
+            'definitions' => 'required|array|min:1',
+            'definitions.*.definition' => 'required|string',
+            'definitions.*.source' => 'nullable|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
@@ -66,7 +68,20 @@ class TermController extends Controller
             $validated['image_path'] = $imagePath;
         }
 
-        Term::create($validated);
+        // Создаем термин
+        $term = Term::create([
+            'name' => $validated['name'],
+            'image_path' => $validated['image_path'] ?? null,
+        ]);
+
+        // Создаем толкования
+        foreach ($validated['definitions'] as $index => $definitionData) {
+            $term->definitions()->create([
+                'definition' => $definitionData['definition'],
+                'source' => $definitionData['source'] ?? null,
+                'sort_order' => $index,
+            ]);
+        }
 
         // Обновляем кеш терминов для автоматических ссылок
         if (app()->bound(\App\Services\FigureLinkService::class)) {
@@ -99,7 +114,10 @@ class TermController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'definition' => 'required|string',
+            'definitions' => 'required|array|min:1',
+            'definitions.*.definition' => 'required|string',
+            'definitions.*.source' => 'nullable|string',
+            'definitions.*.id' => 'nullable|exists:term_definitions,id',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
@@ -116,7 +134,42 @@ class TermController extends Controller
             $validated['image_path'] = $imagePath;
         }
 
-        $term->update($validated);
+        // Обновляем основную информацию о термине
+        $term->update([
+            'name' => $validated['name'],
+            'image_path' => $validated['image_path'] ?? $term->image_path,
+        ]);
+
+        // Получаем существующие ID толкований
+        $existingDefinitionIds = $term->definitions->pluck('id')->toArray();
+        $updatedDefinitionIds = [];
+
+        // Обновляем или создаем толкования
+        foreach ($validated['definitions'] as $index => $definitionData) {
+            if (isset($definitionData['id']) && $definitionData['id']) {
+                // Обновляем существующее толкование
+                $definition = $term->definitions()->find($definitionData['id']);
+                if ($definition) {
+                    $definition->update([
+                        'definition' => $definitionData['definition'],
+                        'source' => $definitionData['source'] ?? null,
+                        'sort_order' => $index,
+                    ]);
+                    $updatedDefinitionIds[] = $definition->id;
+                }
+            } else {
+                // Создаем новое толкование
+                $newDefinition = $term->definitions()->create([
+                    'definition' => $definitionData['definition'],
+                    'source' => $definitionData['source'] ?? null,
+                    'sort_order' => $index,
+                ]);
+                $updatedDefinitionIds[] = $newDefinition->id;
+            }
+        }
+
+        // Удаляем толкования, которые больше не существуют
+        $term->definitions()->whereNotIn('id', $updatedDefinitionIds)->delete();
 
         // Обновляем кеш терминов для автоматических ссылок
         if (app()->bound(\App\Services\FigureLinkService::class)) {

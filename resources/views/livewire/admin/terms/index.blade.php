@@ -61,7 +61,16 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-sm font-medium text-gray-900">{{ $term->name }}</div>
-                                <div class="text-sm text-gray-500">{{ Str::limit($term->definition, 50) }}</div>
+                                @if($term->definitions->isNotEmpty())
+                                    <div class="text-sm text-gray-500">{{ Str::limit($term->definitions->first()->definition, 50) }}</div>
+                                    @if($term->definitions->count() > 1)
+                                        <div class="text-xs text-blue-600 font-medium">
+                                            + {{ $term->definitions->count() - 1 }} {{ $term->definitions->count() == 2 ? 'толкування' : 'толкувань' }}
+                                        </div>
+                                    @endif
+                                @else
+                                    <div class="text-sm text-gray-400">Толкування відсутнє</div>
+                                @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                 <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-medium">

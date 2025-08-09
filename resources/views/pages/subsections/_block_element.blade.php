@@ -7,12 +7,12 @@
             @break
 
         @case('keywords')
-            @if($element->processed_keywords)
+            @if($element->processed_keywords && is_array($element->processed_keywords) && count($element->processed_keywords) > 0)
                 <div class="mt-2 border border-yellow-500 p-6 pb-4 rounded-2xl">
                     <span class="font-semibold">Ключові слова:</span>
-                    @foreach($element->processed_keywords as $keyword)
+                    @foreach($element->processed_keywords as $index => $keyword)
                         <span class="inline-block py-1 text-base font-light text-gray-700 mr-1">
-                            {!! $keyword !!},
+                            {!! $keyword !!}@if($index < count($element->processed_keywords) - 1),@endif
                         </span>
                     @endforeach
                 </div>

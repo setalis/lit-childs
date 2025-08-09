@@ -51,7 +51,28 @@
                         @if($term->image_path)
                             <img src="{{ asset('storage/' . $term->image_path) }}" alt="{{ $term->name }}" class="w-full h-auto object-cover rounded mb-3 max-h-48">
                         @endif
-                        <p class="text-gray-600 text-sm">{{ $term->definition }}</p>
+                        
+                        {{-- Показываем первое толкование для краткого просмотра --}}
+                        @if($term->definitions->isNotEmpty())
+                            <div class="text-gray-600 text-sm mb-3">
+                                {{ Str::limit($term->definitions->first()->definition, 150) }}
+                            </div>
+                            
+                            @if($term->definitions->count() > 1)
+                                <div class="text-xs text-blue-600 font-medium">
+                                    + ще {{ $term->definitions->count() - 1 }} {{ $term->definitions->count() == 2 ? 'толкування' : 'толкувань' }}
+                                </div>
+                            @endif
+                        @else
+                            <p class="text-gray-400 text-sm">Толкування відсутнє</p>
+                        @endif
+                        
+                        <div class="mt-4">
+                            <a href="{{ route('terms.show', $term) }}" 
+                               class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                                Докладніше →
+                            </a>
+                        </div>
                     </div>
                 @endforeach
             </div>

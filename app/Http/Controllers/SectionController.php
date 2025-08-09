@@ -13,8 +13,21 @@ class SectionController extends Controller
      */
     public function index(): View
     {
-        $sections = Section::orderBy('order')->get();
-        return view('pages.sections.index', compact('sections')); // Путь к view может измениться
+        $sections = Section::with([
+            'subsections' => function($query) {
+                $query->orderBy('order');
+            },
+            'subsections.theoryBlock',
+            'subsections.practiceBlocks' => function($query) {
+                $query->orderBy('order');
+            },
+            'subsections.homeworkBlock',
+            'subsections.controlBlocks' => function($query) {
+                $query->orderBy('order');
+            }
+        ])->orderBy('order')->get();
+        
+        return view('pages.sections.index', compact('sections'));
     }
 
     /**

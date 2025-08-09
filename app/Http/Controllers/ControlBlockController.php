@@ -12,12 +12,18 @@ class ControlBlockController extends Controller
     /**
      * Display all control blocks for subsection.
      */
-    public function showAll(Subsection $subsection): View
+    public function showAll(Subsection $subsection, Request $request): View
     {
         // Завантажуємо необхідні дані
         $subsection->load(['section', 'controlBlocks.elements', 'controlBlocks.test.questions.answers', 'controlBlocks.test.questions.matchPairs']);
+        
+        // Получаем все контрольные блоки для передачи в представление
+        $controlBlocks = $subsection->controlBlocks;
+        
+        // Получаем ID целевого блока, если указан
+        $targetBlockId = $request->get('block_id');
 
-        return view('pages.blocks.control_all_show', compact('subsection'));
+        return view('pages.blocks.control_all_show', compact('subsection', 'controlBlocks', 'targetBlockId'));
     }
 
     /**

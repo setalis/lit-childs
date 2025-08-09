@@ -124,9 +124,7 @@
                     <div class="practice-section-content">
                                                  @foreach($practiceBlocks['reproductive'] as $practiceBlock)
                              <div class="mb-6 last:mb-0" id="practice-block-{{ $practiceBlock->id }}">
-                                 <h3 class="text-lg font-semibold mb-3 text-gray-800">
-                                     Практична робота №{{ $practiceBlock->order }} ({{ $subsection->section->order }}.{{ $subsection->order }})
-                                 </h3>
+                                 
                                  @if($practiceBlock->elements->isNotEmpty())
                                     @foreach($practiceBlock->elements as $element)
                                         @include('pages.subsections._block_element', ['element' => $element])
@@ -150,9 +148,7 @@
                     <div class="practice-section-content">
                                                  @foreach($practiceBlocks['constructive'] as $practiceBlock)
                              <div class="mb-6 last:mb-0" id="practice-block-{{ $practiceBlock->id }}">
-                                 <h3 class="text-lg font-semibold mb-3 text-gray-800">
-                                     Практична робота №{{ $practiceBlock->order }} ({{ $subsection->section->order }}.{{ $subsection->order }})
-                                 </h3>
+                                 
                                  @if($practiceBlock->elements->isNotEmpty())
                                     @foreach($practiceBlock->elements as $element)
                                         @include('pages.subsections._block_element', ['element' => $element])
@@ -176,16 +172,13 @@
                      <div class="practice-section-content">
                          @foreach($practiceBlocks['creative'] as $practiceBlock)
                              <div class="mb-6 last:mb-0" id="practice-block-{{ $practiceBlock->id }}">
-                                 <h3 class="text-lg font-semibold mb-3 text-gray-800">
-                                     Практична робота №{{ $practiceBlock->order }} ({{ $subsection->section->order }}.{{ $subsection->order }})
-                                 </h3>
-                                 @if($practiceBlock->elements->isNotEmpty())
+                                @if($practiceBlock->elements->isNotEmpty())
                                      @foreach($practiceBlock->elements as $element)
                                          @include('pages.subsections._block_element', ['element' => $element])
                                      @endforeach
-                                 @else
+                                @else
                                      <p class="text-gray-600">Практична робота ще не додана.</p>
-                                 @endif
+                                @endif
                              </div>
                          @endforeach
                      </div>

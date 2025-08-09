@@ -48,10 +48,12 @@ class Index extends Component
 
     public function render()
     {
-        $terms = Term::query()
+        $terms = Term::with('definitions')
             ->when($this->search, function ($query) {
                 $query->where('name', 'like', '%' . $this->search . '%')
-                      ->orWhere('definition', 'like', '%' . $this->search . '%');
+                      ->orWhereHas('definitions', function ($q) {
+                          $q->where('definition', 'like', '%' . $this->search . '%');
+                      });
             })
             ->orderBy('name', 'asc')
             ->paginate(15);

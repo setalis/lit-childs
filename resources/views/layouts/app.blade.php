@@ -171,8 +171,8 @@
                     <!-- <a href="{{ route('dictionary.index') }}" class="text-gray-700 hover:text-[#3A6EA5] px-3 py-2 rounded-md text-sm font-medium">СЛОВНИК ДОВІДНИК</a> -->
                     <a href="{{ route('figures.index') }}" class="text-gray-700 hover:text-[#3A6EA5] px-3 py-2 rounded-md text-sm font-medium">ПЕРСОНАЛІЇ</a>
                     <a href="{{ route('terms.index') }}" class="text-gray-700 hover:text-[#3A6EA5] px-3 py-2 rounded-md text-sm font-medium">СЛОВНИК-ДОВІДНИК</a>
-                    <a href="#" class="text-gray-700 hover:text-[#3A6EA5] px-3 py-2 rounded-md text-sm font-medium">МЕДІА КОНТЕНТ</a>
-                    <a href="#" class="text-gray-700 hover:text-[#3A6EA5] px-3 py-2 rounded-md text-sm font-medium">РЕКОМЕНДОВАНА ЛІТЕРАТУРА</a>
+                    <a href="{{ route('mediacontent.index') }}" class="text-gray-700 hover:text-[#3A6EA5] px-3 py-2 rounded-md text-sm font-medium">МЕДІА КОНТЕНТ</a>
+                    <a href="{{ route('literature') }}" class="text-gray-700 hover:text-[#3A6EA5] px-3 py-2 rounded-md text-sm font-medium">РЕКОМЕНДОВАНА ЛІТЕРАТУРА</a>
                 </nav>
                 {{-- Mobile menu button --}}
                 <div class="md:hidden">
@@ -191,8 +191,8 @@
                 <a href="{{ route('dictionary.index') }}" class="text-gray-700 hover:text-[#3A6EA5] block px-3 py-2 rounded-md text-base font-medium">СЛОВНИК ДОВІДНИК</a>
                 <a href="{{ route('figures.index') }}" class="text-gray-700 hover:text-[#3A6EA5] block px-3 py-2 rounded-md text-base font-medium">ПЕРСОНАЛІЇ</a>
                 <a href="{{ route('terms.index') }}" class="text-gray-700 hover:text-[#3A6EA5] block px-3 py-2 rounded-md text-base font-medium">СЛОВНИК</a>
-                <a href="#" class="text-gray-700 hover:text-[#3A6EA5] block px-3 py-2 rounded-md text-base font-medium">МЕДІА КОНТЕНТ</a>
-                <a href="#" class="text-gray-700 hover:text-[#3A6EA5] block px-3 py-2 rounded-md text-base font-medium">РЕКОМЕНДОВАНА ЛІТЕРАТУРА</a>
+                <a href="{{ route('mediacontent.index') }}" class="text-gray-700 hover:text-[#3A6EA5] block px-3 py-2 rounded-md text-base font-medium">МЕДІА КОНТЕНТ</a>
+                <a href="{{ route('literature') }}" class="text-gray-700 hover:text-[#3A6EA5] block px-3 py-2 rounded-md text-base font-medium">РЕКОМЕНДОВАНА ЛІТЕРАТУРА</a>
             </div>
         </div>
     </header>

@@ -42,9 +42,22 @@
                          class="float-left mr-6 mb-4 max-w-xs w-full sm:max-w-sm md:max-w-md rounded-lg shadow-lg">
                 @endif
                 
-                {{-- Определение с автоматическими ссылками --}}
-                <div class="text-base leading-relaxed">
-                    {!! $term->processed_definition !!}
+                {{-- Толкования термина --}}
+                <div class="space-y-6">
+                    @foreach($term->definitions as $index => $definition)
+                        <div class="definition-block border-l-4 border-green-500 pl-6 py-4 {{ $index > 0 ? 'mt-6' : '' }}">
+                            <div class="text-base leading-relaxed mb-4">
+                                {!! $definition->processed_definition !!}
+                            </div>
+                            
+                            @if($definition->source)
+                                <div class="source-block bg-gray-50 p-4 rounded-lg border">
+                                    <div class="text-sm font-medium text-gray-700 mb-2">Джерело:</div>
+                                    <div class="text-sm text-gray-600 italic">{{ $definition->source }}</div>
+                                </div>
+                            @endif
+                        </div>
+                    @endforeach
                 </div>
             </div>
             

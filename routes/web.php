@@ -48,6 +48,14 @@ Route::post('/test/{test}/submit', [\App\Http\Controllers\TestController::class,
 
 Route::post('/tinymce/upload-image', [TinyMCEImageController::class, 'upload'])->name('tinymce.upload-image');
 
+Route::get('/mediacontent', function () {
+    return view('pages.mediacontent.index');
+})->name('mediacontent.index');
+
+Route::get('/literature', function () {
+    return view('pages.literature');
+})->name('literature');
+
 Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/sections', AdminSectionsIndex::class)->name('sections.index');
     Route::get('/subsections', AdminSubsectionsIndex::class)->name('subsections.index');
@@ -69,6 +77,17 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     Route::get('/terms/{term}/edit', [AdminTermController::class, 'edit'])->name('terms.edit');
     Route::put('/terms/{term}', [TermController::class, 'update'])->name('terms.update');
     Route::delete('/terms/{term}', [TermController::class, 'destroy'])->name('terms.destroy');
+
+    // Маршруты для управления медиа-контентом
+
+    
+
+    // Route::get('/mediacontent', AdminMediaContentIndex::class)->name('mediacontent.index');
+    // Route::get('/mediacontent/create', [AdminMediaContentController::class, 'create'])->name('mediacontent.create');
+    // Route::post('/mediacontent', [MediaContentController::class, 'store'])->name('mediacontent.store');
+    // Route::get('/mediacontent/{mediacontent}/edit', [AdminMediaContentController::class, 'edit'])->name('mediacontent.edit');
+    // Route::put('/mediacontent/{mediacontent}', [MediaContentController::class, 'update'])->name('mediacontent.update');
+    // Route::delete('/mediacontent/{mediacontent}', [MediaContentController::class, 'destroy'])->name('mediacontent.destroy');
 });
 
 Route::view('dashboard', 'dashboard')
@@ -100,7 +119,8 @@ Route::get('test/simple', function () {
 })->name('test.simple');
 
 Route::get('test/terms', function () {
-    return view('pages.test.terms-test');
+    $terms = \App\Models\Term::with('definitions')->orderBy('name')->get();
+    return view('test.terms-test', compact('terms'));
 })->name('test.terms');
 
 Route::get('test/links-styling', function () {

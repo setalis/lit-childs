@@ -36,7 +36,7 @@
                     <div class="bg-white border border-yellow-400 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
                         {{-- Изображение --}}
                         @if($figure->image_path)
-                            <div class="w-full h-48 overflow-hidden">
+                            <div class="w-full h-72 overflow-hidden">
                                 <img src="{{ asset('storage/' . $figure->image_path) }}" 
                                      alt="{{ $figure->display_name }}" 
                                      class="w-full h-full object-cover">
@@ -57,13 +57,13 @@
                             </h3>
                             
                             {{-- Краткое описание --}}
-                            <p class="text-gray-600 text-sm mb-4 leading-relaxed">
+                            <div class="text-gray-600 text-sm mb-4 leading-relaxed">
                                 @if($figure->biography)
                                     {!! process_figure_links(Str::limit($figure->biography, 120)) !!}
                                 @else
                                     <span class="text-gray-400">Опис відсутній</span>
                                 @endif
-                            </p>
+                            </div>
                             
                             {{-- Кнопка "Докладніше" --}}
                             <div class="flex justify-start">

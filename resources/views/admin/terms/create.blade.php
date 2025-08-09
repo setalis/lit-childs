@@ -47,17 +47,45 @@
                 </div>
 
                 <div class="mb-6">
-                    <label for="definition" class="block text-sm font-medium text-gray-700 mb-2">
-                        Визначення *
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Толкування терміна *
                     </label>
-                    <textarea name="definition" 
-                              id="definition" 
-                              rows="10"
-                              class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 @error('definition') border-red-500 @enderror"
-                              required>{{ old('definition') }}</textarea>
-                    @error('definition')
-                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                    @enderror
+                    
+                    <div id="definitions-container">
+                        <div class="definition-item border border-gray-300 rounded-md p-4 mb-4">
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    Толкування 1 *
+                                </label>
+                                <textarea name="definitions[0][definition]" 
+                                          rows="6"
+                                          class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 @error('definitions.0.definition') border-red-500 @enderror"
+                                          required>{{ old('definitions.0.definition') }}</textarea>
+                                @error('definitions.0.definition')
+                                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                                @enderror
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    Джерело інформації
+                                </label>
+                                <textarea name="definitions[0][source]" 
+                                          rows="3"
+                                          placeholder="Наприклад: Літературознавчий словник-довідник, 2-е вид., випр. і доп. / Р.Т. Громʼяк, Ю.І. Ковалів та ін. Київ : ВЦ 'Академія', 2006. 752 с."
+                                          class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 @error('definitions.0.source') border-red-500 @enderror">{{ old('definitions.0.source') }}</textarea>
+                                @error('definitions.0.source')
+                                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                                @enderror
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button type="button" 
+                            onclick="addDefinition()"
+                            class="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors text-sm">
+                        + Додати ще одне толкування
+                    </button>
                 </div>
 
                 <div class="flex justify-end space-x-4">
@@ -75,4 +103,49 @@
         </div>
     </div>
 </div>
+
+<script>
+let definitionCount = 1;
+
+function addDefinition() {
+    const container = document.getElementById('definitions-container');
+    const newItem = document.createElement('div');
+    newItem.className = 'definition-item border border-gray-300 rounded-md p-4 mb-4';
+    
+    newItem.innerHTML = `
+        <div class="flex justify-between items-center mb-4">
+            <label class="block text-sm font-medium text-gray-700">
+                Толкування ${definitionCount + 1} *
+            </label>
+            <button type="button" 
+                    onclick="removeDefinition(this)" 
+                    class="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition-colors text-sm">
+                Видалити
+            </button>
+        </div>
+        <div class="mb-4">
+            <textarea name="definitions[${definitionCount}][definition]" 
+                      rows="6"
+                      class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      required></textarea>
+        </div>
+        <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+                Джерело інформації
+            </label>
+            <textarea name="definitions[${definitionCount}][source]" 
+                      rows="3"
+                      placeholder="Наприклад: Літературознавчий словник-довідник, 2-е вид., випр. і доп. / Р.Т. Громʼяк, Ю.І. Ковалів та ін. Київ : ВЦ 'Академія', 2006. 752 с."
+                      class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+        </div>
+    `;
+    
+    container.appendChild(newItem);
+    definitionCount++;
+}
+
+function removeDefinition(button) {
+    button.closest('.definition-item').remove();
+}
+</script>
 </x-layouts.app> 

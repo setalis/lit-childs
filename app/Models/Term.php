@@ -11,10 +11,25 @@ class Term extends Model
 
     protected $fillable = [
         'name',
-        'definition',
         'image_path',
         // 'first_letter' не нужно добавлять в fillable, так как это вычисляемое поле
     ];
+
+    /**
+     * Отношение к толкованиям термина
+     */
+    public function definitions()
+    {
+        return $this->hasMany(TermDefinition::class)->orderBy('sort_order');
+    }
+
+    /**
+     * Получает первое толкование для обратной совместимости
+     */
+    public function getDefinitionAttribute()
+    {
+        return $this->definitions->first()?->definition ?? '';
+    }
 
     /**
      * Получает обработанное определение с автоматическими ссылками
