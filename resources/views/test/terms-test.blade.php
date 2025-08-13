@@ -66,10 +66,10 @@
                                 </div>
                                 @foreach($term->definitions as $index => $definition)
                                     <div class="mt-2 p-3 bg-gray-50 rounded">
-                                        <div class="text-sm"><strong>{{ $index + 1 }}.</strong> {{ Str::limit($definition->definition, 100) }}</div>
+                                        <div class="text-sm"><strong>{{ $index + 1 }}.</strong> {!! Str::limit($definition->definition, 100) !!}</div>
                                         @if($definition->source)
                                             <div class="text-xs text-gray-500 mt-1">
-                                                <strong>Джерело:</strong> {{ Str::limit($definition->source, 80) }}
+                                                <strong>Джерело:</strong> {!! Str::limit($definition->source, 80) !!}
                                             </div>
                                         @endif
                                     </div>
@@ -87,3 +87,6 @@
     </div>
 </div>
 @endsection
+
+
+

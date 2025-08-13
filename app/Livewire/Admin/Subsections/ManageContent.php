@@ -122,6 +122,12 @@ class ManageContent extends Component
         $content = null;
         if ($this->elementType === 'text') {
             $content = $this->elementContentText;
+            // Отладочная информация для проверки содержимого
+            logger('Сохранение текстового элемента:', [
+                'content_length' => strlen($content),
+                'content_preview' => substr($content, 0, 100),
+                'element_id' => $this->editingBlockElementId
+            ]);
         } elseif ($this->elementType === 'keywords') {
             $content = $this->elementContentKeywords;
         } elseif ($this->elementType === 'list') {

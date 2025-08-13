@@ -55,7 +55,7 @@
                         {{-- Показываем первое толкование для краткого просмотра --}}
                         @if($term->definitions->isNotEmpty())
                             <div class="text-gray-600 text-sm mb-3">
-                                {{ Str::limit($term->definitions->first()->definition, 150) }}
+                                {!! Str::limit($term->definitions->first()->definition, 150) !!}
                             </div>
                             
                             @if($term->definitions->count() > 1)

@@ -53,7 +53,7 @@
                             @if($definition->source)
                                 <div class="source-block bg-gray-50 p-4 rounded-lg border">
                                     <div class="text-sm font-medium text-gray-700 mb-2">Джерело:</div>
-                                    <div class="text-sm text-gray-600 italic">{{ $definition->source }}</div>
+                                    <div class="text-sm text-gray-600 italic">{!! $definition->source !!}</div>
                                 </div>
                             @endif
                         </div>

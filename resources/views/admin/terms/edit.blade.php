@@ -1,6 +1,19 @@
 <x-layouts.app title="Редагувати термін">
-<div class="container mx-auto px-4 py-8">
-    <div class="max-w-2xl mx-auto">
+
+<style>
+/* Скрываем только проблемные элементы TinyMCE, но не диалоговые окна */
+.tox-silver-sink {
+    position: fixed !important;
+    z-index: 9999 !important;
+}
+.tox-tinymce-aux {
+    position: fixed !important;
+    z-index: 9999 !important;
+}
+</style>
+
+<div class="container w-full mx-auto px-4 py-8">
+    <div class="max-w-5xl mx-auto">
         <div class="flex items-center mb-6">
             <a href="{{ route('admin.terms.index') }}" 
                class="text-blue-500 hover:text-blue-700 mr-4"
@@ -13,57 +26,61 @@
         </div>
 
         <div class="bg-white shadow-lg rounded-lg p-6">
-            <form action="{{ route('admin.terms.update', $term) }}" method="POST" enctype="multipart/form-data">
+            <form action="{{ route('admin.terms.update', $term) }}" method="POST" enctype="multipart/form-data" id="termForm">
                 @csrf
                 @method('PUT')
 
-                <div class="mb-4">
-                    <label for="name" class="block text-sm font-medium text-gray-700 mb-2">
-                        Назва терміна *
-                    </label>
-                    <input type="text" 
-                           name="name" 
-                           id="name" 
-                           value="{{ old('name', $term->name) }}"
-                           class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 @error('name') border-red-500 @enderror"
-                           required>
-                    @error('name')
-                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                    @enderror
+                {{-- Основная информация --}}
+                <div class="mb-8">
+                    <h2 class="text-xl font-semibold text-gray-900 mb-4 border-b border-gray-200 pb-2">Основна інформація</h2>
+                    
+                    <div class="mb-4">
+                        <label for="name" class="block text-sm font-medium text-gray-700 mb-2">
+                            Назва терміна *
+                        </label>
+                        <input type="text" 
+                               name="name" 
+                               id="name" 
+                               value="{{ old('name', $term->name) }}"
+                               class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                               required>
+                        @error('name')
+                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="image" class="block text-sm font-medium text-gray-700 mb-2">
+                            Зображення
+                        </label>
+                        
+                        @if($term->image_path)
+                            <div class="mb-3">
+                                <img src="{{ asset('storage/' . $term->image_path) }}" 
+                                     alt="{{ $term->name }}" 
+                                     class="w-32 h-32 object-cover rounded-lg">
+                                <p class="text-sm text-gray-500 mt-1">Поточне зображення</p>
+                            </div>
+                        @endif
+                        
+                        <input type="file" 
+                               name="image" 
+                               id="image" 
+                               accept="image/*"
+                               class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        @error('image')
+                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                        <p class="text-gray-500 text-sm mt-1">Поддерживаемые форматы: JPEG, PNG, JPG, GIF. Максимальный размер: 2MB</p>
+                        @if($term->image_path)
+                            <p class="text-gray-500 text-sm">Залиште поле порожнім, якщо не хочете змінювати зображення</p>
+                        @endif
+                    </div>
                 </div>
 
-                <div class="mb-4">
-                    <label for="image" class="block text-sm font-medium text-gray-700 mb-2">
-                        Зображення
-                    </label>
-                    
-                    @if($term->image_path)
-                        <div class="mb-3">
-                            <img src="{{ asset('storage/' . $term->image_path) }}" 
-                                 alt="{{ $term->name }}" 
-                                 class="w-32 h-32 object-cover rounded-lg">
-                            <p class="text-sm text-gray-500 mt-1">Поточне зображення</p>
-                        </div>
-                    @endif
-                    
-                    <input type="file" 
-                           name="image" 
-                           id="image" 
-                           accept="image/*"
-                           class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 @error('image') border-red-500 @enderror">
-                    @error('image')
-                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                    @enderror
-                    <p class="text-gray-500 text-sm mt-1">Поддерживаемые форматы: JPEG, PNG, JPG, GIF. Максимальный размер: 2MB</p>
-                    @if($term->image_path)
-                        <p class="text-gray-500 text-sm">Залиште поле порожнім, якщо не хочете змінювати зображення</p>
-                    @endif
-                </div>
-
-                <div class="mb-6">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
-                        Толкування терміна *
-                    </label>
+                {{-- Определения термина --}}
+                <div class="mb-8">
+                    <h2 class="text-xl font-semibold text-gray-900 mb-4 border-b border-gray-200 pb-2">Толкування терміна</h2>
                     
                     <div id="definitions-container">
                         @foreach($term->definitions as $index => $definition)
@@ -80,10 +97,10 @@
                                         </button>
                                     @endif
                                 </div>
-                                <div class="mb-4">
+                                <div class="mb-6">
                                     <textarea name="definitions[{{ $index }}][definition]" 
-                                              rows="6"
-                                              class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 @error('definitions.' . $index . '.definition') border-red-500 @enderror"
+                                              id="definition_{{ $index }}"
+                                              class="w-full border border-gray-300 rounded-md tinymce-editor"
                                               required>{{ old('definitions.' . $index . '.definition', $definition->definition) }}</textarea>
                                     @error('definitions.' . $index . '.definition')
                                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -95,9 +112,9 @@
                                         Джерело інформації
                                     </label>
                                     <textarea name="definitions[{{ $index }}][source]" 
-                                              rows="3"
+                                              id="source_{{ $index }}"
                                               placeholder="Наприклад: Літературознавчий словник-довідник, 2-е вид., випр. і доп. / Р.Т. Громʼяк, Ю.І. Ковалів та ін. Київ : ВЦ 'Академія', 2006. 752 с."
-                                              class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 @error('definitions.' . $index . '.source') border-red-500 @enderror">{{ old('definitions.' . $index . '.source', $definition->source) }}</textarea>
+                                              class="w-full border border-gray-300 rounded-md tinymce-editor">{{ old('definitions.' . $index . '.source', $definition->source) }}</textarea>
                                     @error('definitions.' . $index . '.source')
                                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                     @enderror
@@ -115,14 +132,14 @@
                     </button>
                 </div>
 
-                <div class="flex justify-end space-x-4">
+                <div class="flex justify-end gap-4">
                     <a href="{{ route('admin.terms.index') }}" 
-                       class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors"
+                       class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
                        wire:navigate>
                         Скасувати
                     </a>
                     <button type="submit" 
-                            class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors">
+                            class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
                         Оновити
                     </button>
                 </div>
@@ -150,10 +167,10 @@ function addDefinition() {
                 Видалити
             </button>
         </div>
-        <div class="mb-4">
+        <div class="mb-6">
             <textarea name="definitions[${definitionCount}][definition]" 
-                      rows="6"
-                      class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      id="definition_${definitionCount}"
+                      class="w-full border border-gray-300 rounded-md tinymce-editor"
                       required></textarea>
         </div>
         <div class="mb-4">
@@ -161,18 +178,70 @@ function addDefinition() {
                 Джерело інформації
             </label>
             <textarea name="definitions[${definitionCount}][source]" 
-                      rows="3"
+                      id="source_${definitionCount}"
                       placeholder="Наприклад: Літературознавчий словник-довідник, 2-е вид., випр. і доп. / Р.Т. Громʼяк, Ю.І. Ковалів та ін. Київ : ВЦ 'Академія', 2006. 752 с."
-                      class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                      class="w-full border border-gray-300 rounded-md tinymce-editor"></textarea>
         </div>
     `;
     
     container.appendChild(newItem);
     definitionCount++;
+    
+    // Инициализируем TinyMCE для новых полей
+    if (typeof TinyMCEManager !== 'undefined') {
+        setTimeout(() => {
+            TinyMCEManager.initAllEditors();
+        }, 100);
+    }
 }
 
 function removeDefinition(button) {
     button.closest('.definition-item').remove();
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Используем TinyMCEManager для инициализации
+    if (typeof TinyMCEManager !== 'undefined') {
+        // Инициализируем все textarea как редакторы
+        const editors = [];
+        @foreach($term->definitions as $index => $definition)
+            editors.push('definition_{{ $index }}', 'source_{{ $index }}');
+        @endforeach
+        
+        editors.forEach(function(editorId) {
+            const textarea = document.getElementById(editorId);
+            if (textarea) {
+                textarea.classList.add('tinymce-editor');
+            }
+        });
+        
+        // Инициализируем редакторы
+        TinyMCEManager.initAllEditors();
+        
+        // Добавляем обработчик отправки формы для загрузки изображений
+        const form = document.getElementById('termForm');
+        if (form) {
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                try {
+                    // Загружаем все изображения перед отправкой формы
+                    const uploadSuccess = await TinyMCEManager.getInstance().uploadAllImages();
+                    
+                    if (uploadSuccess) {
+                        console.log('Изображения загружены, отправляем форму');
+                        form.submit();
+                    } else {
+                        alert('Ошибка при загрузке изображений. Попробуйте еще раз.');
+                    }
+                } catch (error) {
+                    console.error('Ошибка при загрузке изображений:', error);
+                    alert('Ошибка при загрузке изображений: ' + error.message);
+                }
+            });
+        }
+    }
+});
 </script>
+
 </x-layouts.app> 

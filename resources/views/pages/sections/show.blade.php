@@ -178,8 +178,10 @@
     @endif
 
     @if($section->description)
-        <div class=" text-lg">
-            {!! nl2br(e($section->description)) !!}
+         <div class="text-lg list-normal border border-yellow-400 rounded-lg p-4">
+            <h2 class="text-2xl font-bold mb-8 uppercase text-[#28569A] bg-yellow-400 rounded-lg p-2">Очікувані результати навчання
+            </h2>
+            {!! $section->description !!}
         </div>
     @endif
 

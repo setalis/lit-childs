@@ -72,7 +72,7 @@
         <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold mb-3">{{ $test->title }}</h1>
             @if($test->description)
-                <p class="text-lg sm:text-xl opacity-90">{{ $test->description }}</p>
+                <p class="text-lg sm:text-xl opacity-90">{!! $test->description !!}</p>
             @endif
             <div class="mt-4">
                 <span class="bg-white bg-opacity-20 px-4 py-2 rounded-full text-sm">

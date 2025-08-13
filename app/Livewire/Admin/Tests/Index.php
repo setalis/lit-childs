@@ -34,6 +34,7 @@ class Index extends Component
     {
         $this->resetForm();
         $this->showModal = true;
+        $this->dispatch('init-test-tinymce');
     }
 
     public function openEditModal($id)
@@ -43,6 +44,10 @@ class Index extends Component
         $this->title = $test->title;
         $this->description = $test->description;
         $this->order = $test->order;
+        
+        $this->showModal = true;
+        $this->dispatch('init-test-tinymce');
+        
         $this->questions = [];
         foreach ($test->questions as $q) {
             $item = [
@@ -225,6 +230,7 @@ class Index extends Component
 
     public function closeModal()
     {
+        $this->dispatch('cleanup-test-tinymce');
         $this->showModal = false;
         $this->resetForm();
     }
@@ -232,6 +238,13 @@ class Index extends Component
     public function save()
     {
         $this->validate();
+        
+        // Отладочная информация
+        logger('Сохранение теста:', [
+            'description' => $this->description,
+            'description_length' => strlen($this->description),
+            'contains_html' => strpos($this->description, '<') !== false
+        ]);
         if ($this->editingId) {
             $test = Test::findOrFail($this->editingId);
             $test->update([
@@ -299,6 +312,7 @@ class Index extends Component
                 }
             }
         }
+        $this->dispatch('cleanup-test-tinymce');
         $this->showModal = false;
         $this->resetForm();
         session()->flash('message', 'Тест успешно сохранён.');

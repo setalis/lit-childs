@@ -123,7 +123,7 @@
                                 <div class="text-sm text-green-700">
                                     <p class="mb-2">Кількість питань: {{ $controlBlock->test->questions->count() }}</p>
                                     @if($controlBlock->test->description)
-                                        <p class="text-gray-600">{{ $controlBlock->test->description }}</p>
+                                        <p class="text-gray-600">{!! $controlBlock->test->description !!}</p>
                                     @endif
                                 </div>
                                 <a href="{{ route('test.show', $controlBlock->test->id) }}" 

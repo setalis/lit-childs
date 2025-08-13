@@ -133,3 +133,150 @@ body, p, div, span, a, li, td, th, input, textarea, select, button {
     font-family: 'Roboto', sans-serif;
     font-weight: 500;
 }
+
+.list-normal ol {
+    
+    padding-left: 20px;
+    counter-reset: custom-counter;
+}
+
+.list-normal ol > li {
+    position: relative;
+    padding-left: 50px;
+    margin-bottom: 12px;
+    line-height: 1.6;
+}
+
+.list-normal ol > li::before {
+    counter-increment: custom-counter;
+    content: counter(custom-counter);
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 30px;
+    height: 30px;
+    background: #3399cc;
+    color: #fff;
+    font-weight: 600;
+    font-size: 14px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(51, 153, 204, 0.2);
+}
+
+.list-normal ul {
+    list-style: none;
+    padding-left: 20px;
+}
+
+.list-normal ul > li {
+    position: relative;
+    padding-left: 20px;
+    margin-bottom: 10px;
+    line-height: 1.6;
+}
+
+.list-normal ul > li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 8px;
+    width: 8px;
+    height: 8px;
+    background: #3399cc;
+    border-radius: 50%;
+    box-shadow: 0 1px 2px rgba(51, 153, 204, 0.3);
+}
+
+.list-normal li {
+    margin-bottom: 10px;
+}
+
+/* Стили для вложенных списков */
+.list-normal ol ol {
+    margin-top: 8px;
+    margin-bottom: 8px;
+}
+
+.list-normal ol ol > li::before {
+    width: 20px;
+    height: 20px;
+    font-size: 12px;
+    background: #94BDDD;
+}
+
+.list-normal ul ul > li::before {
+    width: 6px;
+    height: 6px;
+    background: #94BDDD;
+}
+
+/* Стили для последнего элемента списка */
+.list-normal li:last-child {
+    margin-bottom: 0;
+}
+
+/* Анимация при наведении */
+.list-normal ol > li:hover::before,
+.list-normal ul > li:hover::before {
+    transform: scale(1.1);
+    transition: transform 0.2s ease;
+}
+
+/* Стили для обтекания изображений в TinyMCE и контенте */
+.float-left {
+    float: left !important;
+}
+
+.float-right {
+    float: right !important;
+}
+
+.me-3 {
+    margin-right: 1rem !important;
+}
+
+.ms-3 {
+    margin-left: 1rem !important;
+}
+
+.mb-2 {
+    margin-bottom: 0.5rem !important;
+}
+
+.d-block {
+    display: block !important;
+}
+
+.mx-auto {
+    margin-left: auto !important;
+    margin-right: auto !important;
+}
+
+/* Стили для TinyMCE контента */
+.mce-content-body img.float-left {
+    float: left;
+    margin-right: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.mce-content-body img.float-right {
+    float: right;
+    margin-left: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.mce-content-body img.d-block.mx-auto {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Очистка обтекания после контента */
+.clearfix::after {
+    content: "";
+    display: table;
+    clear: both;
+}

@@ -160,44 +160,20 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Ждем загрузки TinyMCE
-    const waitForTinyMCE = setInterval(function() {
-        if (typeof tinymce !== 'undefined') {
-            clearInterval(waitForTinyMCE);
-            console.log('TinyMCE доступен, инициализируем редакторы');
-            initTinyMCE();
-        }
-    }, 100);
-    
-    // Таймаут на случай, если TinyMCE не загрузится
-    setTimeout(function() {
-        clearInterval(waitForTinyMCE);
-        if (typeof tinymce === 'undefined') {
-            console.error('TinyMCE не загрузился в течение 5 секунд');
-        }
-    }, 5000);
-    
-    function initTinyMCE() {
-        // Инициализация TinyMCE для всех полей с базовыми плагинами
+    // Используем TinyMCEManager для инициализации
+    if (typeof TinyMCEManager !== 'undefined') {
+        // Инициализируем все textarea как редакторы
         const editors = ['biography', 'sources', 'biography_2', 'sources_2'];
         
         editors.forEach(function(editorId) {
-            tinymce.init({
-                selector: '#' + editorId,
-                height: 300,
-                plugins: 'lists link code',
-                toolbar: 'bold italic | bullist numlist | link | code',
-                menubar: false,
-                statusbar: false,
-                branding: false,
-                resize: false,
-                setup: function(editor) {
-                    editor.on('change', function() {
-                        editor.save();
-                    });
-                }
-            });
+            const textarea = document.getElementById(editorId);
+            if (textarea) {
+                textarea.classList.add('tinymce-editor');
+            }
         });
+        
+        // Инициализируем редакторы
+        TinyMCEManager.initAllEditors();
     }
 });
 </script>

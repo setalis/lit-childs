@@ -46,7 +46,13 @@ Route::get('/terms/{term}', [TermController::class, 'show'])->name('terms.show')
 Route::get('/test/{test}', [\App\Http\Controllers\TestController::class, 'show'])->name('test.show');
 Route::post('/test/{test}/submit', [\App\Http\Controllers\TestController::class, 'submit'])->name('test.submit');
 
+// API маршрут для загрузки изображений (без CSRF)
+Route::post('/api/tinymce/upload-image', [TinyMCEImageController::class, 'upload'])->name('tinymce.upload-image-api');
+
+// Обычный маршрут для загрузки изображений
 Route::post('/tinymce/upload-image', [TinyMCEImageController::class, 'upload'])->name('tinymce.upload-image');
+
+
 
 Route::get('/mediacontent', function () {
     return view('pages.mediacontent.index');

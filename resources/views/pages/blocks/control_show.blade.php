@@ -88,7 +88,7 @@
                         <h3 class="text-xl font-semibold text-gray-800 mb-4">{{ $controlBlock->test->title }}</h3>
                         
                         @if($controlBlock->test->description)
-                            <p class="text-gray-600 mb-4">{{ $controlBlock->test->description }}</p>
+                            <p class="text-gray-600 mb-4">{!! $controlBlock->test->description !!}</p>
                         @endif
                         
                         <div class="flex items-center justify-between mb-6">
@@ -139,7 +139,7 @@
                                     <h3 class="text-lg font-semibold text-gray-800 mb-3">{{ $test->title }}</h3>
                                     
                                     @if($test->description)
-                                        <p class="text-gray-600 mb-4 text-sm">{{ Str::limit($test->description, 80) }}</p>
+                                        <p class="text-gray-600 mb-4 text-sm">{!! Str::limit($test->description, 80) !!}</p>
                                     @endif
                                     
                                     <div class="space-y-2 mb-4">

@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Schoolbook')</title>
 
     {{-- Подключение Vite для Tailwind CSS --}}
@@ -260,10 +261,9 @@
 
     @stack('scripts')
     
-    {{-- TinyMCE Editor - ЗАГРУЖАЕТСЯ В КОНЦЕ ДОКУМЕНТА --}}
-    <script src="{{ asset('js/tinymce/tinymce.min.js') }}" referrerpolicy="origin"></script>
+    {{-- TinyMCE Editor - УПРАВЛЯЕТСЯ ЧЕРЕЗ TinyMCEManager --}}
     <script>
-        console.log('TinyMCE загружен в конце документа:', typeof tinymce !== 'undefined');
+        console.log('TinyMCE будет загружен через TinyMCEManager');
     </script>
     
     <script>

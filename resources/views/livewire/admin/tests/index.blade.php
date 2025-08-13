@@ -6,7 +6,7 @@
         </div>
     @endif
     <div class="mb-4 flex justify-end">
-        <button wire:click="openCreateModal" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Додати тест</button>
+        <button wire:click="openCreateModal" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">Додати тест</button>
     </div>
     <div class="bg-white shadow rounded-lg">
         <table class="min-w-full divide-y divide-gray-200">
@@ -22,7 +22,7 @@
                 @foreach($tests as $test)
                     <tr>
                         <td class="px-6 py-4 whitespace-nowrap">{{ $test->title }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap">{{ Str::limit($test->description, 60) }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">{!! Str::limit($test->description, 60) !!}</td>
                         <td class="px-6 py-4 whitespace-nowrap">{{ $test->order }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-right">
                             <button wire:click="openEditModal({{ $test->id }})" class="text-indigo-600 hover:text-indigo-900 mr-2">Редагувати</button>
@@ -36,37 +36,37 @@
 
     @if($showModal)
         <div class="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-40">
-            <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-2xl overflow-y-auto max-h-[90vh]">
+            <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-6xl overflow-y-auto max-h-[90vh] mx-4">
                 <h3 class="text-lg font-semibold mb-4">@if($editingId) Редагування тесту @else Додавання тесту @endif</h3>
-                <form wire:submit.prevent="save">
+                <form wire:submit.prevent="save" id="testForm">
                     <div class="mb-4">
                         <label class="block text-gray-700 text-sm font-bold mb-2">Назва тесту</label>
-                        <input type="text" wire:model.defer="title" class="w-full border rounded px-3 py-2" required>
+                        <input type="text" wire:model.defer="title" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" required>
                     </div>
                     <div class="mb-4">
                         <label class="block text-gray-700 text-sm font-bold mb-2">Опис</label>
-                        <textarea wire:model.defer="description" class="w-full border rounded px-3 py-2"></textarea>
+                        <textarea wire:model.blur="description" id="testDescription" class="w-full border border-gray-300 rounded-md px-3 py-2 tinymce-editor focus:outline-none focus:ring-2 focus:ring-blue-500" rows="6">{{ $description }}</textarea>
                     </div>
                     <div class="mb-4">
                         <label class="block text-gray-700 text-sm font-bold mb-2">Порядок</label>
-                        <input type="number" wire:model.defer="order" class="w-full border rounded px-3 py-2">
+                        <input type="number" wire:model.defer="order" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
                     </div>
 
                     <div class="mb-6">
                         <div class="flex justify-between items-center mb-2">
                             <span class="font-semibold">Питання</span>
                             <div class="flex gap-2">
-                                <button type="button" wire:click="collapseAllQuestions" class="px-2 py-1 bg-gray-200 rounded text-xs hover:bg-gray-300">Згорнути всі</button>
-                                <button type="button" wire:click="expandAllQuestions" class="px-2 py-1 bg-gray-200 rounded text-xs hover:bg-gray-300">Розгорнути всі</button>
-                                <button type="button" wire:click="addQuestion" class="px-3 py-1 bg-green-500 text-white rounded text-sm hover:bg-green-600">Додати питання</button>
+                                <button type="button" wire:click="collapseAllQuestions" class="px-2 py-1 bg-gray-200 rounded-md text-xs hover:bg-gray-300 transition-colors">Згорнути всі</button>
+                                <button type="button" wire:click="expandAllQuestions" class="px-2 py-1 bg-gray-200 rounded-md text-xs hover:bg-gray-300 transition-colors">Розгорнути всі</button>
+                                <button type="button" wire:click="addQuestion" class="px-3 py-1 bg-green-500 text-white rounded-md text-sm hover:bg-green-600 transition-colors">Додати питання</button>
                             </div>
                         </div>
                         @foreach($questions as $qIndex => $q)
-                            <div class="border rounded p-3 mb-4 bg-gray-50">
+                            <div class="border border-gray-300 rounded-md p-3 mb-4 bg-gray-50">
                                 <div class="flex justify-between items-center mb-2">
                                     <span class="font-semibold">Питання #{{ $qIndex+1 }}</span>
                                     <div class="flex gap-2 items-center">
-                                        <button type="button" wire:click="toggleCollapseQuestion({{ $qIndex }})" class="text-xs px-2 py-1 bg-gray-200 rounded hover:bg-gray-300 flex items-center" title="Згорнути/Розгорнути">
+                                        <button type="button" wire:click="toggleCollapseQuestion({{ $qIndex }})" class="text-xs px-2 py-1 bg-gray-200 rounded-md hover:bg-gray-300 transition-colors flex items-center" title="Згорнути/Розгорнути">
                                             <svg class="w-4 h-4 transition-transform duration-200 @if(!($collapsedQuestions[$qIndex] ?? false)) rotate-90 @endif" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
                                             </svg>
@@ -81,7 +81,7 @@
                                 @if(!($collapsedQuestions[$qIndex] ?? false))
                                 <div class="mb-2">
                                     <label class="block text-xs font-bold mb-1">Тип питання</label>
-                                    <select wire:model="questions.{{ $qIndex }}.type" class="border rounded px-2 py-1">
+                                    <select wire:model="questions.{{ $qIndex }}.type" class="border border-gray-300 rounded-md px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500">
                                         @foreach($questionTypes as $type => $label)
                                             <option value="{{ $type }}">{{ $label }}</option>
                                         @endforeach
@@ -89,11 +89,11 @@
                                 </div>
                                 <div class="mb-2">
                                     <label class="block text-xs font-bold mb-1">Текст питання</label>
-                                    <input type="text" wire:model="questions.{{ $qIndex }}.text" class="w-full border rounded px-2 py-1">
+                                    <input type="text" wire:model="questions.{{ $qIndex }}.text" class="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500">
                                 </div>
                                 <div class="mb-2">
                                     <label class="block text-xs font-bold mb-1">Порядок</label>
-                                    <input type="number" wire:model="questions.{{ $qIndex }}.order" class="w-24 border rounded px-2 py-1">
+                                    <input type="number" wire:model="questions.{{ $qIndex }}.order" class="w-24 border border-gray-300 rounded-md px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500">
                                 </div>
                                 @if(in_array($q['type'], ['single_choice', 'multiple_choice']))
                                     <div class="mb-2">
@@ -215,11 +215,81 @@
                     </div>
 
                     <div class="flex justify-end space-x-2">
-                        <button type="button" wire:click="closeModal" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Скасувати</button>
-                        <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Зберегти</button>
+                        <button type="button" wire:click="closeModal" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition-colors">Скасувати</button>
+                        <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">Зберегти</button>
                     </div>
                 </form>
             </div>
         </div>
     @endif
 </div>
+
+<script>
+// Инициализация TinyMCE при открытии модального окна
+document.addEventListener('livewire:init', () => {
+    Livewire.on('init-test-tinymce', () => {
+        setTimeout(() => {
+            if (typeof TinyMCEManager !== 'undefined') {
+                TinyMCEManager.getInstance().initAllEditors();
+                
+                // Добавляем обработчик отправки формы для синхронизации
+                const form = document.getElementById('testForm');
+                if (form) {
+                    form.addEventListener('submit', function(e) {
+                        // Синхронизируем TinyMCE с textarea перед отправкой
+                        if (typeof tinymce !== 'undefined') {
+                            const editor = tinymce.get('testDescription');
+                            if (editor) {
+                                const content = editor.getContent();
+                                const textarea = document.getElementById('testDescription');
+                                if (textarea) {
+                                    textarea.value = content;
+                                    textarea.dispatchEvent(new Event('input', { bubbles: true }));
+                                    textarea.dispatchEvent(new Event('blur', { bubbles: true }));
+                                }
+                            }
+                        }
+                    });
+                }
+            }
+        }, 200);
+    });
+    
+    Livewire.on('cleanup-test-tinymce', () => {
+        if (typeof TinyMCEManager !== 'undefined') {
+            TinyMCEManager.getInstance().cleanupAllEditors();
+        }
+    });
+    
+    // Синхронизация перед Livewire запросами
+    Livewire.hook('morph.updating', () => {
+        if (typeof tinymce !== 'undefined') {
+            const editor = tinymce.get('testDescription');
+            if (editor) {
+                const content = editor.getContent();
+                const textarea = document.getElementById('testDescription');
+                if (textarea) {
+                    textarea.value = content;
+                    textarea.dispatchEvent(new Event('blur', { bubbles: true }));
+                }
+            }
+        }
+    });
+});
+
+// Функция сохранения с принудительной синхронизацией TinyMCE
+function saveTestWithSync() {
+    // Синхронизируем все редакторы перед сохранением
+    if (typeof TinyMCEManager !== 'undefined') {
+        TinyMCEManager.getInstance().syncAllEditors();
+    }
+    
+    // Даем время на синхронизацию
+    setTimeout(() => {
+        const livewireComponent = Livewire.find(document.querySelector('[wire\\:id]').getAttribute('wire:id'));
+        if (livewireComponent) {
+            livewireComponent.call('save');
+        }
+    }, 100);
+}
+</script>
