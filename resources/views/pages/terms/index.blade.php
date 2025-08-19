@@ -41,22 +41,25 @@
     @else
         @foreach($terms as $letter => $termsByLetter)
             @if(!$selectedLetter)
-                <h2 class="text-2xl font-semibold mt-6 mb-3 text-gray-700">{{ $letter }}</h2>
+                <h2 class="text-2xl text-center md:text-left font-semibold mt-6 mb-3 text-gray-700">{{ $letter }}</h2>
             @endif
             
             @php
                 $totalTerms = count($termsByLetter);
                 $halfCount = ceil($totalTerms / 2);
-                $column1 = $termsByLetter->take($halfCount);
-                $column2 = $termsByLetter->skip($halfCount);
+                $thirdCount = ceil($totalTerms / 3);
+                $column1 = $termsByLetter->take($thirdCount);
+                $column2 = $termsByLetter->skip($thirdCount)->take($thirdCount);
+                $column3 = $termsByLetter->skip($thirdCount * 2);
             @endphp
             
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-x-20 gap-y-6">
+            {{-- Адаптивная сетка: 1 колонка на мобильных, 3 колонки на больших экранах --}}
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-x-20">
                 {{-- Первая колонка --}}
                 <div class="space-y-6">
                     @foreach($column1 as $term)
-                        <a href="{{ route('terms.show', $term) }}">
-                            <h3 class="text-xl font-semibold mb-2 text-green-700 underline decoration-dotted underline-offset-3">{{ $term->name }}</h3>
+                        <a href="{{ route('terms.show', $term) }}" class="block">
+                            <h3 class="text-xl font-semibold mb-2 text-green-700 underline decoration-dotted underline-offset-3 hover:text-green-800 transition-colors">{{ $term->name }}</h3>
                         </a>
                     @endforeach
                 </div>
@@ -64,8 +67,17 @@
                 {{-- Вторая колонка --}}
                 <div class="space-y-6">
                     @foreach($column2 as $term)
-                        <a href="{{ route('terms.show', $term) }}">
-                            <h3 class="text-xl font-semibold mb-2 text-green-700 underline decoration-dotted underline-offset-3">{{ $term->name }}</h3>
+                        <a href="{{ route('terms.show', $term) }}" class="block">
+                            <h3 class="text-xl font-semibold mb-2 text-green-700 underline decoration-dotted underline-offset-3 hover:text-green-800 transition-colors">{{ $term->name }}</h3>
+                        </a>
+                    @endforeach
+                </div>
+                
+                {{-- Третья колонка --}}
+                <div class="space-y-6">
+                    @foreach($column3 as $term)
+                        <a href="{{ route('terms.show', $term) }}" class="block">
+                            <h3 class="text-xl font-semibold mb-2 text-green-700 underline decoration-dotted underline-offset-3 hover:text-green-800 transition-colors">{{ $term->name }}</h3>
                         </a>
                     @endforeach
                 </div>

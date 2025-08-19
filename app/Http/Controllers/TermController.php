@@ -3,10 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Term;
-use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\View\View;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\View\View;
 
 class TermController extends Controller
 {
@@ -31,10 +31,10 @@ class TermController extends Controller
 
         // Получаем уникальные заглавные буквы для навигации
         $letters = Term::selectRaw('UPPER(SUBSTRING(name, 1, 1)) as first_letter')
-                      ->distinct()
-                      ->orderBy('first_letter')
-                      ->pluck('first_letter')
-                      ->filter(); // Убираем пустые значения
+            ->distinct()
+            ->orderBy('first_letter')
+            ->pluck('first_letter')
+            ->filter(); // Убираем пустые значения
 
         return view('pages.terms.index', compact('terms', 'letters', 'selectedLetter'));
     }
@@ -57,11 +57,15 @@ class TermController extends Controller
             'definitions' => 'required|array|min:1',
             'definitions.*.definition' => 'required|string',
             'definitions.*.source' => 'nullable|string',
+            'definitions.*.images' => 'nullable|array',
+            'definitions.*.images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'definitions.*.images_alt' => 'nullable|array',
+            'definitions.*.images_alt.*' => 'nullable|string|max:255',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         // Приводим первую букву к заглавной для украинских символов
-        $validated['name'] = mb_strtoupper(mb_substr($validated['name'], 0, 1, 'UTF-8'), 'UTF-8') . mb_substr($validated['name'], 1, null, 'UTF-8');
+        $validated['name'] = mb_strtoupper(mb_substr($validated['name'], 0, 1, 'UTF-8'), 'UTF-8').mb_substr($validated['name'], 1, null, 'UTF-8');
 
         if ($request->hasFile('image')) {
             $imagePath = $request->file('image')->store('terms', 'public');
@@ -76,11 +80,26 @@ class TermController extends Controller
 
         // Создаем толкования
         foreach ($validated['definitions'] as $index => $definitionData) {
-            $term->definitions()->create([
+            $definition = $term->definitions()->create([
                 'definition' => $definitionData['definition'],
                 'source' => $definitionData['source'] ?? null,
                 'sort_order' => $index,
             ]);
+
+            // Загружаем дополнительные изображения для определения (только для дополнительных толкований)
+            if ($index > 0 && isset($definitionData['images']) && is_array($definitionData['images'])) {
+                foreach ($definitionData['images'] as $imageIndex => $image) {
+                    if ($image && $image->isValid()) {
+                        $imagePath = $image->store('terms/additional', 'public');
+
+                        $definition->images()->create([
+                            'image_path' => $imagePath,
+                            'alt_text' => $definitionData['images_alt'][$imageIndex] ?? null,
+                            'sort_order' => $imageIndex,
+                        ]);
+                    }
+                }
+            }
         }
 
         // Обновляем кеш терминов для автоматических ссылок
@@ -118,18 +137,25 @@ class TermController extends Controller
             'definitions.*.definition' => 'required|string',
             'definitions.*.source' => 'nullable|string',
             'definitions.*.id' => 'nullable|exists:term_definitions,id',
+            'definitions.*.images' => 'nullable|array',
+            'definitions.*.images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'definitions.*.images_alt' => 'nullable|array',
+            'definitions.*.images_alt.*' => 'nullable|string|max:255',
+            'definitions.*.existing_images' => 'nullable|array',
+            'definitions.*.existing_images.*.id' => 'nullable|exists:term_images,id',
+            'definitions.*.existing_images.*.alt_text' => 'nullable|string|max:255',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         // Приводим первую букву к заглавной для украинских символов
-        $validated['name'] = mb_strtoupper(mb_substr($validated['name'], 0, 1, 'UTF-8'), 'UTF-8') . mb_substr($validated['name'], 1, null, 'UTF-8');
+        $validated['name'] = mb_strtoupper(mb_substr($validated['name'], 0, 1, 'UTF-8'), 'UTF-8').mb_substr($validated['name'], 1, null, 'UTF-8');
 
         if ($request->hasFile('image')) {
             // Удаляем старое изображение
             if ($term->image_path) {
                 Storage::disk('public')->delete($term->image_path);
             }
-            
+
             $imagePath = $request->file('image')->store('terms', 'public');
             $validated['image_path'] = $imagePath;
         }
@@ -156,6 +182,35 @@ class TermController extends Controller
                         'sort_order' => $index,
                     ]);
                     $updatedDefinitionIds[] = $definition->id;
+
+                    // Обновляем существующие изображения
+                    if (isset($definitionData['existing_images']) && is_array($definitionData['existing_images'])) {
+                        foreach ($definitionData['existing_images'] as $imageData) {
+                            if (isset($imageData['id'])) {
+                                $image = $definition->images()->find($imageData['id']);
+                                if ($image) {
+                                    $image->update([
+                                        'alt_text' => $imageData['alt_text'] ?? null,
+                                    ]);
+                                }
+                            }
+                        }
+                    }
+
+                    // Добавляем новые изображения
+                    if ($index > 0 && isset($definitionData['images']) && is_array($definitionData['images'])) {
+                        foreach ($definitionData['images'] as $imageIndex => $image) {
+                            if ($image && $image->isValid()) {
+                                $imagePath = $image->store('terms/additional', 'public');
+
+                                $definition->images()->create([
+                                    'image_path' => $imagePath,
+                                    'alt_text' => $definitionData['images_alt'][$imageIndex] ?? null,
+                                    'sort_order' => $definition->images()->count() + $imageIndex,
+                                ]);
+                            }
+                        }
+                    }
                 }
             } else {
                 // Создаем новое толкование
@@ -165,6 +220,21 @@ class TermController extends Controller
                     'sort_order' => $index,
                 ]);
                 $updatedDefinitionIds[] = $newDefinition->id;
+
+                // Добавляем изображения для нового определения
+                if ($index > 0 && isset($definitionData['images']) && is_array($definitionData['images'])) {
+                    foreach ($definitionData['images'] as $imageIndex => $image) {
+                        if ($image && $image->isValid()) {
+                            $imagePath = $image->store('terms/additional', 'public');
+
+                            $newDefinition->images()->create([
+                                'image_path' => $imagePath,
+                                'alt_text' => $definitionData['images_alt'][$imageIndex] ?? null,
+                                'sort_order' => $imageIndex,
+                            ]);
+                        }
+                    }
+                }
             }
         }
 
@@ -189,6 +259,13 @@ class TermController extends Controller
             Storage::disk('public')->delete($term->image_path);
         }
 
+        // Удаляем дополнительные изображения
+        foreach ($term->definitions as $definition) {
+            foreach ($definition->images as $image) {
+                Storage::disk('public')->delete($image->image_path);
+            }
+        }
+
         $term->delete();
 
         // Обновляем кеш терминов для автоматических ссылок
@@ -197,5 +274,30 @@ class TermController extends Controller
         }
 
         return redirect()->route('admin.terms.index')->with('success', 'Термін успішно видалено.');
+    }
+
+    /**
+     * Remove the specified image from storage.
+     */
+    public function destroyImage(\App\Models\TermImage $image): \Illuminate\Http\JsonResponse
+    {
+        try {
+            // Проверяем права доступа
+            if (! auth()->user()) {
+                return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+            }
+
+            // Удаляем файл изображения
+            if (Storage::disk('public')->exists($image->image_path)) {
+                Storage::disk('public')->delete($image->image_path);
+            }
+
+            // Удаляем запись из базы данных
+            $image->delete();
+
+            return response()->json(['success' => true, 'message' => 'Зображення успішно видалено']);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Помилка при видаленні зображення'], 500);
+        }
     }
 }

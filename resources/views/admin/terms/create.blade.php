@@ -96,6 +96,16 @@
                                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                 @enderror
                             </div>
+
+                            {{-- Для первого толкования не показываем поля дополнительных изображений --}}
+                            <div class="mb-4 p-3 bg-blue-50 rounded-lg">
+                                <p class="text-sm text-blue-700">
+                                    <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                    Для першого толкування використовується основне зображення терміна вище
+                                </p>
+                            </div>
                         </div>
                     </div>
                     
@@ -156,6 +166,31 @@ function addDefinition() {
                       placeholder="Наприклад: Літературознавчий словник-довідник, 2-е вид., випр. і доп. / Р.Т. Громʼяк, Ю.І. Ковалів та ін. Київ : ВЦ 'Академія', 2006. 752 с."
                       class="w-full border border-gray-300 rounded-md tinymce-editor"></textarea>
         </div>
+
+        {{-- Дополнительные изображения для определения (только для дополнительных толкований) --}}
+        <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+                Додаткові зображення
+            </label>
+            <div class="space-y-3">
+                <div class="flex items-center space-x-3">
+                    <input type="file" 
+                           name="definitions[${definitionCount}][images][]" 
+                           accept="image/*"
+                           class="flex-1 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <input type="text" 
+                           name="definitions[${definitionCount}][images_alt][]" 
+                           placeholder="Alt текст"
+                           class="w-32 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+            </div>
+            <div id="additional-images-${definitionCount}" class="mt-2 space-y-2"></div>
+            <button type="button" 
+                    onclick="addImageField(${definitionCount})"
+                    class="mt-2 px-3 py-1 bg-gray-500 text-white rounded text-sm hover:bg-gray-600">
+                + Додати зображення
+            </button>
+        </div>
     `;
     
     container.appendChild(newItem);
@@ -171,6 +206,23 @@ function addDefinition() {
 
 function removeDefinition(button) {
     button.closest('.definition-item').remove();
+}
+
+function addImageField(definitionIndex) {
+    const container = document.getElementById(`additional-images-${definitionIndex}`);
+    const newImageField = document.createElement('div');
+    newImageField.className = 'flex items-center space-x-3';
+    newImageField.innerHTML = `
+        <input type="file" 
+               name="definitions[${definitionIndex}][images][]" 
+               accept="image/*"
+               class="flex-1 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <input type="text" 
+               name="definitions[${definitionIndex}][images_alt][]" 
+               placeholder="Alt текст"
+               class="w-32 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+    `;
+    container.appendChild(newImageField);
 }
 
 document.addEventListener('DOMContentLoaded', function() {

@@ -2,8 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -13,22 +11,25 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
-        // User::factory()->create([
-        //     'name' => 'Test User',
-        //     'email' => 'test@example.com',
-        // ]);
-
+        // Сначала создаем базовые структуры
         $this->call([
             UserSeeder::class,
             SectionSeeder::class,
             SubsectionSeeder::class,
-            ContentBlockSeeder::class,
+        ]);
+
+        // Затем создаем контент
+        $this->call([
             TermSeeder::class,
             FigureSeeder::class,
+            ContentBlockSeeder::class,
             TestSeeder::class,
-            // Здесь будут другие сидеры
+        ]);
+
+        // В конце создаем тестовые данные
+        $this->call([
+            ControlBlockTestSeeder::class,
+            TestFigureSeeder::class,
         ]);
     }
 }

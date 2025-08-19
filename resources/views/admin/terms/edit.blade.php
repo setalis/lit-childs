@@ -119,6 +119,76 @@
                                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                     @enderror
                                 </div>
+
+                                @if($index === 0)
+                                    {{-- Для первого толкования не показываем поля дополнительных изображений --}}
+                                    <div class="mb-4 p-3 bg-blue-50 rounded-lg">
+                                        <p class="text-sm text-blue-700">
+                                            <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                            </svg>
+                                            Для першого толкування використовується основне зображення терміна вище
+                                        </p>
+                                    </div>
+                                @else
+                                    {{-- Существующие изображения для дополнительных толкований --}}
+                                    @if($definition->images->count() > 0)
+                                        <div class="mb-4">
+                                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                                Поточні зображення
+                                            </label>
+                                            <div class="existing-images-container space-y-3">
+                                                @foreach($definition->images as $imageIndex => $image)
+                                                    <div class="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                                                        <img src="{{ asset('storage/' . $image->image_path) }}" 
+                                                             alt="{{ $image->alt_text }}" 
+                                                             class="w-16 h-16 object-cover rounded">
+                                                        <div class="flex-1">
+                                                            <input type="hidden" 
+                                                                   name="definitions[{{ $index }}][existing_images][{{ $imageIndex }}][id]" 
+                                                                   value="{{ $image->id }}">
+                                                            <input type="text" 
+                                                                   name="definitions[{{ $index }}][existing_images][{{ $imageIndex }}][alt_text]" 
+                                                                   value="{{ old('definitions.' . $index . '.existing_images.' . $imageIndex . '.alt_text', $image->alt_text) }}"
+                                                                   placeholder="Alt текст"
+                                                                   class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                                        </div>
+                                                        <button type="button" 
+                                                                onclick="removeExistingImage(this, {{ $image->id }})"
+                                                                class="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-sm">
+                                                            Видалити
+                                                        </button>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        </div>
+                                    @endif
+
+                                    {{-- Дополнительные изображения для определения --}}
+                                    <div class="mb-4">
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                                            Додати нові зображення
+                                        </label>
+                                        <div class="space-y-3">
+                                            <div class="flex items-center space-x-3">
+                                                <input type="file" 
+                                                       name="definitions[{{ $index }}][images][]" 
+                                                       accept="image/*"
+                                                       class="flex-1 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                                <input type="text" 
+                                                       name="definitions[{{ $index }}][images_alt][]" 
+                                                       placeholder="Alt текст"
+                                                       class="w-32 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                            </div>
+                                        </div>
+                                        <div id="additional-images-{{ $index }}" class="mt-2 space-y-2"></div>
+                                        <button type="button" 
+                                                onclick="addImageField({{ $index }})"
+                                                class="mt-2 px-3 py-1 bg-gray-500 text-white rounded text-sm hover:bg-gray-600">
+                                            + Додати зображення
+                                        </button>
+                                    </div>
+                                @endif
                                 
                                 <input type="hidden" name="definitions[{{ $index }}][id]" value="{{ $definition->id }}">
                             </div>
@@ -197,6 +267,55 @@ function addDefinition() {
 
 function removeDefinition(button) {
     button.closest('.definition-item').remove();
+}
+
+function addImageField(definitionIndex) {
+    const container = document.getElementById(`additional-images-${definitionIndex}`);
+    const newField = document.createElement('div');
+    newField.className = 'flex items-center space-x-3';
+    
+    newField.innerHTML = `
+        <input type="file" 
+               name="definitions[${definitionIndex}][images][]" 
+               accept="image/*"
+               class="flex-1 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <input type="text" 
+               name="definitions[${definitionIndex}][images_alt][]" 
+               placeholder="Alt текст"
+               class="w-32 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+    `;
+    
+    container.appendChild(newField);
+}
+
+function removeExistingImage(button, imageId) {
+    if (confirm('Ви впевнені, що хочете видалити це зображення?')) {
+        // Отправляем AJAX запрос для удаления изображения
+        fetch(`/admin/terms/images/${imageId}`, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Удаляем элемент из DOM
+                const imageContainer = button.closest('.flex.items-center.space-x-3.p-3.bg-gray-50.rounded-lg');
+                if (imageContainer) {
+                    imageContainer.remove();
+                }
+            } else {
+                alert('Помилка при видаленні зображення: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Помилка при видаленні зображення');
+        });
+    }
 }
 
 document.addEventListener('DOMContentLoaded', function() {

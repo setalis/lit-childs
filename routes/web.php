@@ -1,20 +1,20 @@
 <?php
 
-use App\Http\Controllers\SectionController;
-use App\Http\Controllers\SubsectionController;
-use App\Http\Controllers\DictionaryController;
-use App\Http\Controllers\FigureController;
-use App\Http\Controllers\TermController;
 use App\Http\Controllers\Admin\FigureController as AdminFigureController;
 use App\Http\Controllers\Admin\TermController as AdminTermController;
-use App\Http\Controllers\HomeController;
 use App\Http\Controllers\BlockDisplayController;
 use App\Http\Controllers\ControlBlockController;
+use App\Http\Controllers\DictionaryController;
+use App\Http\Controllers\FigureController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\SectionController;
+use App\Http\Controllers\SubsectionController;
+use App\Http\Controllers\TermController;
 use App\Http\Controllers\TinyMCEImageController;
+use App\Livewire\Admin\Figures\Index as AdminFiguresIndex;
 use App\Livewire\Admin\Sections\Index as AdminSectionsIndex;
 use App\Livewire\Admin\Subsections\Index as AdminSubsectionsIndex;
 use App\Livewire\Admin\Subsections\ManageContent as AdminSubsectionsManageContent;
-use App\Livewire\Admin\Figures\Index as AdminFiguresIndex;
 use App\Livewire\Admin\Terms\Index as AdminTermsIndex;
 use App\Livewire\Settings\Appearance;
 use App\Livewire\Settings\Password;
@@ -52,8 +52,6 @@ Route::post('/api/tinymce/upload-image', [TinyMCEImageController::class, 'upload
 // Обычный маршрут для загрузки изображений
 Route::post('/tinymce/upload-image', [TinyMCEImageController::class, 'upload'])->name('tinymce.upload-image');
 
-
-
 Route::get('/mediacontent', function () {
     return view('pages.mediacontent.index');
 })->name('mediacontent.index');
@@ -67,7 +65,7 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     Route::get('/subsections', AdminSubsectionsIndex::class)->name('subsections.index');
     Route::get('/subsections/{subsection}/content', AdminSubsectionsManageContent::class)->name('subsections.content');
     Route::get('/tests', \App\Livewire\Admin\Tests\Index::class)->name('tests.index');
-    
+
     // Маршруты для управления персоналиями
     Route::get('/figures', AdminFiguresIndex::class)->name('figures.index');
     Route::get('/figures/create', [AdminFigureController::class, 'create'])->name('figures.create');
@@ -75,7 +73,7 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     Route::get('/figures/{figure}/edit', [AdminFigureController::class, 'edit'])->name('figures.edit');
     Route::put('/figures/{figure}', [FigureController::class, 'update'])->name('figures.update');
     Route::delete('/figures/{figure}', [FigureController::class, 'destroy'])->name('figures.destroy');
-    
+
     // Маршруты для управления терминами
     Route::get('/terms', AdminTermsIndex::class)->name('terms.index');
     Route::get('/terms/create', [AdminTermController::class, 'create'])->name('terms.create');
@@ -83,10 +81,9 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     Route::get('/terms/{term}/edit', [AdminTermController::class, 'edit'])->name('terms.edit');
     Route::put('/terms/{term}', [TermController::class, 'update'])->name('terms.update');
     Route::delete('/terms/{term}', [TermController::class, 'destroy'])->name('terms.destroy');
+    Route::delete('/terms/images/{image}', [TermController::class, 'destroyImage'])->name('terms.destroy-image');
 
     // Маршруты для управления медиа-контентом
-
-    
 
     // Route::get('/mediacontent', AdminMediaContentIndex::class)->name('mediacontent.index');
     // Route::get('/mediacontent/create', [AdminMediaContentController::class, 'create'])->name('mediacontent.create');
@@ -126,6 +123,7 @@ Route::get('test/simple', function () {
 
 Route::get('test/terms', function () {
     $terms = \App\Models\Term::with('definitions')->orderBy('name')->get();
+
     return view('test.terms-test', compact('terms'));
 })->name('test.terms');
 

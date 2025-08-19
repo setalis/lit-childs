@@ -3,8 +3,30 @@
 @section('title', 'Персоналії')
 
 @section('content')
-<div class="container mx-auto px-4 py-8">
-    <h1 class="text-3xl font-bold mb-6">Персоналії</h1>
+{{-- Шапка страницы в стиле других страниц --}}
+<div class="flex flex-col items-center justify-center border-b border-yellow-500 mb-8">
+    <div class="container flex flex-col md:flex-row mx-auto lg:px-8 px-4">
+        <div class="w-3/4 flex flex-col justify-center">
+            <h1 class="text-4xl font-bold mb-4 uppercase text-[#28569A]">Персоналії</h1>
+            <h2 class="text-lg sm:text-lg font-bold mb-4 uppercase text-gray-600">Видатні письменники, науковці, критики</h2>
+        </div>
+        <div class="w-1/4 flex flex-col items-center justify-center">
+            <div class="flex flex-col items-center justify-center">
+                <img src="{{ asset('storage/header-1.png') }}" alt="Section 1" class="w-full h-auto">
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container mx-auto px-4 sm:px-6 lg:px-8">
+    {{-- Хлебные крошки --}}
+    <nav class="mb-6 text-sm text-gray-500" aria-label="Breadcrumb">
+        <ol class="list-none p-0 inline-flex space-x-2">
+            <li><a href="{{ route('home') }}" class="text-[#3A6EA5] hover:underline">Головна</a></li>
+            <li><span>/</span></li>
+            <li class="text-gray-700" aria-current="page">Персоналії</li>
+        </ol>
+    </nav>
 
     {{-- Панель фильтрации по буквам --}}
     @if($letters->isNotEmpty())

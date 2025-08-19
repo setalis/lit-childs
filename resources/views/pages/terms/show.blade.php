@@ -3,66 +3,87 @@
 @section('title', $term->name . ' - Словник-довідник')
 
 @section('content')
-<div class="container mx-auto px-4 py-8">
+{{-- Шапка страницы в стиле других страниц --}}
+<div class="flex flex-col items-center justify-center border-b border-yellow-500 mb-4">
+    <div class="container flex flex-col md:flex-row mx-auto lg:px-8 px-4">
+        <div class="w-3/4 flex flex-col justify-center">
+            <h1 class="text-4xl font-bold mb-4 uppercase text-[#28569A]">{{ $term->name }}</h1>
+            <h2 class="text-base mb-4">Термін з словника-довідника</h2>
+        </div>
+        <div class="w-1/4 flex flex-col items-center justify-center">
+            <div class="flex flex-col items-center justify-center">
+                <img src="{{ asset('storage/header-1.png') }}" alt="Section 1" class="w-full h-auto">
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container mx-auto px-4 pb-8">
     {{-- Хлебные крошки --}}
-    <nav class="mb-6 text-sm">
-        <ol class="flex items-center space-x-1">
-            <li>
-                <a href="{{ route('home') }}" class="text-blue-600 hover:text-blue-800">Головна</a>
-            </li>
-            <li>
-                <svg class="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
-                </svg>
-            </li>
-            <li>
-                <a href="{{ route('terms.index') }}" class="text-blue-600 hover:text-blue-800">Словник-довідник</a>
-            </li>
-            <li>
-                <svg class="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
-                </svg>
-            </li>
-            <li>
-                <span class="text-gray-500">{{ $term->name }}</span>
-            </li>
+    <nav class="mb-10 text-sm text-gray-500 max-w-6xl mx-auto" aria-label="Breadcrumb">
+        <ol class="list-none p-0 inline-flex space-x-2">
+            <li><a href="{{ route('home') }}" class="text-[#3A6EA5] hover:underline">Головна</a></li>
+            <li><span>/</span></li>
+            <li><a href="{{ route('terms.index') }}" class="text-[#3A6EA5] hover:underline">Словник-довідник</a></li>
+            <li><span>/</span></li>
+            <li class="text-gray-700" aria-current="page">{{ $term->name }}</li>
         </ol>
     </nav>
 
     {{-- Основное содержимое --}}
-    <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+    <div class="bg-white shadow-lg rounded-lg overflow-hidden max-w-6xl mx-auto">
         <div class="p-6">
-            <h1 class="text-3xl font-bold text-green-700 mb-6">{{ $term->name }}</h1>
-            
-            <div class="text-gray-700 leading-relaxed">
-                @if($term->image_path)
-                    {{-- Изображение с обтеканием текстом --}}
-                    <img src="{{ asset('storage/' . $term->image_path) }}" 
-                         alt="{{ $term->name }}" 
-                         class="float-left mr-6 mb-4 max-w-xs w-full sm:max-w-sm md:max-w-md rounded-lg shadow-lg">
-                @endif
-                
-                {{-- Толкования термина --}}
-                <div class="space-y-6">
-                    @foreach($term->definitions as $index => $definition)
-                        <div class="definition-block border-l-4 border-green-500 pl-6 py-4 {{ $index > 0 ? 'mt-6' : '' }}">
-                            <div class="text-base leading-relaxed mb-4">
-                                {!! $definition->processed_definition !!}
+            <div class="space-y-8">
+                {{-- Толкования термина с изображениями --}}
+                @foreach($term->definitions as $index => $definition)
+                    <div class="definition-block p-6 {{ $index > 0 ? 'mt-6' : '' }}">
+                        <div class="flex flex-col lg:flex-row gap-6">
+                            {{-- Левая колонка с текстом --}}
+                            <div class="{{ ($index === 0 && $term->image_path) || ($index > 0 && $definition->images->count() > 0) ? 'lg:w-2/3' : 'w-full' }}">
+                                <div class="text-base leading-relaxed mb-4">
+                                    {!! $definition->processed_definition !!}
+                                </div>
+                                
+                                @if($definition->source)
+                                    <div class="source-block bg-blue-50 p-4 rounded-lg border">
+                                        <div class="text-sm font-medium text-gray-700 mb-2">Джерело:</div>
+                                        <div class="text-sm text-gray-600 italic">{!! $definition->source !!}</div>
+                                    </div>
+                                @endif
                             </div>
-                            
-                            @if($definition->source)
-                                <div class="source-block bg-gray-50 p-4 rounded-lg border">
-                                    <div class="text-sm font-medium text-gray-700 mb-2">Джерело:</div>
-                                    <div class="text-sm text-gray-600 italic">{!! $definition->source !!}</div>
+
+                            {{-- Правая колонка с изображениями (только если есть изображения) --}}
+                            @if(($index === 0 && $term->image_path) || ($index > 0 && $definition->images->count() > 0))
+                                <div class="lg:w-1/3">
+                                    @if($index === 0 && $term->image_path)
+                                        {{-- Для первого толкования показываем основное изображение термина --}}
+                                        <div class="image-item">
+                                            <img src="{{ asset('storage/' . $term->image_path) }}" 
+                                                 alt="{{ $term->name }}" 
+                                                 class="w-full rounded-lg shadow-lg">
+                                            <p class="text-sm text-gray-600 mt-2 text-center">{{ $term->name }}</p>
+                                        </div>
+                                    @elseif($index > 0 && $definition->images->count() > 0)
+                                        {{-- Для остальных толкований показываем дополнительные изображения --}}
+                                        <div class="space-y-4">
+                                            @foreach($definition->images as $image)
+                                                <div class="image-item">
+                                                    <img src="{{ asset('storage/' . $image->image_path) }}" 
+                                                         alt="{{ $image->alt_text }}" 
+                                                         class="w-full rounded-lg shadow-lg">
+                                                    <p class="text-sm text-gray-600 mt-2 text-center">
+                                                        {{ $image->alt_text }}
+                                                    </p>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    @endif
                                 </div>
                             @endif
                         </div>
-                    @endforeach
-                </div>
+                    </div>
+                @endforeach
             </div>
-            
-            {{-- Очистка float для предотвращения проблем с версткой --}}
-            <div class="clear-both"></div>
         </div>
     </div>
 
