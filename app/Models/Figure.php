@@ -56,11 +56,37 @@ class Figure extends Model
 
     /**
      * Получает отображаемое имя (для обратной совместимости)
-     *
-     * @return string
      */
     public function getDisplayNameAttribute(): string
     {
         return $this->full_name;
+    }
+
+    /**
+     * Получает первую букву фамилии
+     */
+    public function getFirstLetterAttribute(): string
+    {
+        if ($this->last_name) {
+            return mb_strtoupper(mb_substr($this->last_name, 0, 1, 'UTF-8'), 'UTF-8');
+        }
+        return '';
+    }
+
+    /**
+     * Обновляет поле first_letter для всех записей
+     */
+    public static function updateFirstLetters(): void
+    {
+        $figures = self::all();
+        
+        foreach ($figures as $figure) {
+            if ($figure->last_name) {
+                $firstLetter = mb_strtoupper(mb_substr($figure->last_name, 0, 1, 'UTF-8'), 'UTF-8');
+                
+                // Обновляем через raw SQL, так как это виртуальное поле
+                \DB::statement("UPDATE figures SET first_letter = ? WHERE id = ?", [$firstLetter, $figure->id]);
+            }
+        }
     }
 }

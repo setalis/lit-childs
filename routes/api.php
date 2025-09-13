@@ -22,3 +22,5 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 // API маршрут для загрузки изображений TinyMCE (без CSRF)
 Route::post('/tinymce/upload-image', [TinyMCEImageController::class, 'upload']);
 
+
+

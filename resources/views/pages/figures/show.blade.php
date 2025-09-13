@@ -2,7 +2,32 @@
 
 @section('title', $figure->display_name . ' - Персоналії')
 
+@section('meta_description', 'Інформація про ' . $figure->display_name . ' - ' . $figure->biography)
+@section('meta_keywords', 'Інформація про ' . $figure->display_name . ' - ' . $figure->biography)
+
 @section('content')
+<style>
+    .prose ol {
+        list-style-type: decimal;
+        margin-bottom: 1rem;
+        margin-left: 1rem;
+    }
+    .prose ul {
+        list-style-type: disc;
+        margin-bottom: 1rem;
+        margin-left: 1rem;
+    }
+    .prose li {
+        margin-bottom: 1rem;
+    }
+    .prose a {
+        color: #28569A;
+        text-decoration: underline;
+    }
+    .prose a:hover {
+        color: #28569A;
+    }
+</style>
 <div class="flex flex-col items-center justify-center border-b border-yellow-500 ">
     <div class="container max-w-7xl flex flex-col md:flex-row mx-auto lg:px-8 px-4">
         <div class="w-3/4 flex flex-col justify-center">
@@ -67,8 +92,8 @@
                                     </svg>
                                 </div>
                                 <div>
-                                    <h3 class="text-xl font-semibold text-blue-800">Основні джерела</h3>
-                                    <p class="text-sm text-blue-600">Ключові джерела інформації</p>
+                                    <h3 class="text-xl font-semibold text-blue-800">Ключові джерела</h3>
+                                    <!-- <p class="text-sm text-blue-600">Ключові джерела інформації</p> -->
                                 </div>
                             </div>
                             <div class="prose max-w-none text-gray-700 leading-relaxed">

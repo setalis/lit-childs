@@ -31,13 +31,24 @@ class FigureController extends Controller
             });
         }
 
-        // Сортируем группы по алфавиту
-        $figures = $figures->sortKeys();
+        // Правильная сортировка украинского алфавита
+        $ukrainianAlphabet = [
+            'А', 'Б', 'В', 'Г', 'Ґ', 'Д', 'Е', 'Є', 'Ж', 'З', 'И', 'І', 'Ї', 'Й', 'К', 'Л', 'М', 'Н', 'О', 'П', 'Р', 'С', 'Т', 'У', 'Ф', 'Х', 'Ц', 'Ч', 'Ш', 'Щ', 'Ь', 'Ю', 'Я'
+        ];
 
-        // Получаем все уникальные буквы для навигации
+        // Сортируем группы по украинскому алфавиту
+        $figures = $figures->sortBy(function($group, $letter) use ($ukrainianAlphabet) {
+            $index = array_search($letter, $ukrainianAlphabet);
+            return $index !== false ? $index : 999; // Неизвестные символы в конец
+        });
+
+        // Получаем все уникальные буквы для навигации и сортируем по украинскому алфавиту
         $letters = $allFigures->map(function($figure) {
             return mb_strtoupper(mb_substr($figure->last_name, 0, 1, 'UTF-8'), 'UTF-8');
-        })->unique()->sort()->values();
+        })->unique()->sortBy(function($letter) use ($ukrainianAlphabet) {
+            $index = array_search($letter, $ukrainianAlphabet);
+            return $index !== false ? $index : 999; // Неизвестные символы в конец
+        })->values();
 
         return view('pages.figures.index', compact('figures', 'letters', 'selectedLetter'));
     }

@@ -6,7 +6,7 @@
 <style>
     .results-header-bg {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
+        color: "#28569A";
         padding: 4rem 0;
     }
     .result-card {

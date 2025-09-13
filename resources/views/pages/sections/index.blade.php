@@ -207,7 +207,7 @@
                             @foreach($section->subsections as $subsection)
                                 <div class="subsection-item">
                                     <a href="{{ route('subsections.show', $subsection) }}" class="subsection-title">
-                                        {{ $subsection->title }}
+                                        {{ $section->order }}.{{ $subsection->order }} {{ $subsection->title }}
                                     </a>
                                     
                                     <div class="content-blocks">

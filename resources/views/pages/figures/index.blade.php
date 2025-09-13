@@ -3,12 +3,11 @@
 @section('title', 'Персоналії')
 
 @section('content')
-{{-- Шапка страницы в стиле других страниц --}}
-<div class="flex flex-col items-center justify-center border-b border-yellow-500 mb-8">
+<div class="flex flex-col items-center justify-center border-b border-yellow-500 ">
     <div class="container flex flex-col md:flex-row mx-auto lg:px-8 px-4">
         <div class="w-3/4 flex flex-col justify-center">
             <h1 class="text-4xl font-bold mb-4 uppercase text-[#28569A]">Персоналії</h1>
-            <h2 class="text-lg sm:text-lg font-bold mb-4 uppercase text-gray-600">Видатні письменники, науковці, критики</h2>
+            <h2 class="text-xl font-bold mb-4 uppercase">Видатні діячі культури, науки, мистецтва</h2>
         </div>
         <div class="w-1/4 flex flex-col items-center justify-center">
             <div class="flex flex-col items-center justify-center">
@@ -17,16 +16,8 @@
         </div>
     </div>
 </div>
-
-<div class="container mx-auto px-4 sm:px-6 lg:px-8">
-    {{-- Хлебные крошки --}}
-    <nav class="mb-6 text-sm text-gray-500" aria-label="Breadcrumb">
-        <ol class="list-none p-0 inline-flex space-x-2">
-            <li><a href="{{ route('home') }}" class="text-[#3A6EA5] hover:underline">Головна</a></li>
-            <li><span>/</span></li>
-            <li class="text-gray-700" aria-current="page">Персоналії</li>
-        </ol>
-    </nav>
+<div class="container mx-auto px-4 py-8">
+    <!-- <h1 class="text-3xl font-bold mb-6">Персоналії</h1> -->
 
     {{-- Панель фильтрации по буквам --}}
     @if($letters->isNotEmpty())
@@ -53,7 +44,7 @@
             @if(!$selectedLetter)
                 <h2 class="text-2xl font-semibold mt-6 mb-3 text-gray-700">{{ $letter }}</h2>
             @endif
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
                 @foreach($figuresByLetter as $figure)
                     <div class="bg-white border border-yellow-400 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
                         {{-- Изображение --}}
@@ -81,7 +72,7 @@
                             {{-- Краткое описание --}}
                             <div class="text-gray-600 text-sm mb-4 leading-relaxed">
                                 @if($figure->biography)
-                                    {!! process_figure_links(Str::limit($figure->biography, 120)) !!}
+                                    {!! Str::limit(strip_tags($figure->biography, '<p><br><strong><em><u>'), 120) !!}
                                 @else
                                     <span class="text-gray-400">Опис відсутній</span>
                                 @endif

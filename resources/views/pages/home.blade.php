@@ -155,12 +155,14 @@
     </section>
 
     {{-- Test Tasks Block --}}
-    <section class="py-6">
-        <div class="container flex flex-col md:flex-row items-center justify-center mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="w-1/2">                
-                <h2 class="text-3xl font-bold text-[#3A6EA5] mb-6">ТЕСТОВІ ЗАВДАННЯ</h2>
+    <section class="">
+        <div class="container flex flex-col md:flex-row items-center justify-center mx-auto px-8 py-12 md:py-0 sm:px-6 lg:px-8">
+            <div class="w-full md:w-1/2 flex flex-col justify-center gap-2">                
+                <h2 class="text-3xl font-bold text-[#3A6EA5] mb-8 text-center md:text-left">ТЕСТОВІ ЗАВДАННЯ</h2>
                 <p class="text-gray-700 max-w-2xl mb-10 text-lg">Перевірте свої знання за допомогою інтерактивних тестів по кожному розділу та темі підручника.</p>
-                <a href="#" class="bg-[#94BDDD] hover:bg-[#6a8eaa] rounded-full text-white px-8 py-4 uppercase font-bold">ПЕРЕЙТИ ДО ТЕСТІВ</a> {{-- Замените # на актуальный маршрут --}}
+                <div class="flex md:justify-start justify-center pt-2">
+                    <a href="#" class="bg-[#94BDDD] hover:bg-[#6a8eaa] rounded-full text-white px-8 py-4 uppercase font-bold">ПЕРЕЙТИ ДО ТЕСТІВ</a> {{-- Замените # на актуальный маршрут --}}
+                </div>
             </div>
             <div class="w-1/2">
                 <img src="{{ asset('storage/test-tasks.jpg') }}" alt="Тестові завдання" class="mx-auto w-auto">

@@ -65,7 +65,7 @@
 <div class="flex flex-col items-center justify-center border-b border-yellow-500">
     <div class="container flex flex-col md:flex-row mx-auto lg:px-8 px-4">
         <div class="w-3/4 flex flex-col justify-center">
-            <h1 class="text-4xl font-bold mb-4 text-[#28569A]">Способи контролю</h1>
+            <h1 class="text-4xl font-bold mb-4 text-[#28569A]">Засоби контролю</h1>
             <h2 class="text-2xl font-semibold mb-2 text-gray-700">{{ $subsection->section->order }}.{{ $subsection->order }} {{ $subsection->title }}</h2>
         </div>
         <div class="w-1/4 flex flex-col items-center justify-center">
@@ -88,13 +88,13 @@
             <li><span>/</span></li>
             <li><a href="{{ route('subsections.show', $subsection) }}" class="text-[#3A6EA5] hover:underline">{{ $subsection->title }}</a></li>
             <li><span>/</span></li>
-            <li class="text-gray-700" aria-current="page">Способи контролю</li>
+            <li class="text-gray-700" aria-current="page">Засоби контролю</li>
         </ol>
     </nav>
 
     @if($controlBlocks->isEmpty())
         <div class="content-card text-center">
-            <h3 class="text-xl font-semibold text-gray-700 mb-4">Способи контролю відсутні</h3>
+            <h3 class="text-xl font-semibold text-gray-700 mb-4">Засоби контролю відсутні</h3>
             <p class="text-gray-600">Для цього розділу поки що не створено способів контролю знань.</p>
         </div>
     @else
