@@ -9,6 +9,8 @@ use App\Http\Controllers\FigureController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\SectionController;
 use App\Http\Controllers\SubsectionController;
+use App\Http\Controllers\TestController;
+
 use App\Http\Controllers\TermController;
 use App\Http\Controllers\TinyMCEImageController;
 use App\Livewire\Admin\Figures\Index as AdminFiguresIndex;
@@ -109,30 +111,6 @@ Route::get('shablon/section', function () {
     return view('pages.shablon.section');
 });
 
-Route::get('test/figures-demo', function () {
-    return view('pages.test.demo-figures');
-})->name('test.figures-demo');
-
-Route::get('test/flexible-links', function () {
-    return view('pages.test.flexible-links-test');
-})->name('test.flexible-links');
-
-Route::get('test/simple', function () {
-    return view('pages.test.simple-test');
-})->name('test.simple');
-
-Route::get('test/terms', function () {
-    $terms = \App\Models\Term::with('definitions')->orderBy('name')->get();
-
-    return view('test.terms-test', compact('terms'));
-})->name('test.terms');
-
-Route::get('test/links-styling', function () {
-    return view('pages.test.links-styling-test');
-})->name('test.links-styling');
-
-Route::get('shablon/dictionary', function () {
-    return view('pages.shablon.dictionary');
-})->name('shablon.dictionary');
+Route::get('/tests', [TestController::class, 'index'])->name('tests.index');
 
 require __DIR__.'/auth.php';

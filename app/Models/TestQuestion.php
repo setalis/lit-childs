@@ -32,4 +32,19 @@ class TestQuestion extends Model
     {
         return $this->hasMany(TestMatchPair::class, 'question_id');
     }
+
+    /**
+     * Получить украинское название типа вопроса
+     */
+    public function getTypeDisplayAttribute(): string
+    {
+        $typeNames = [
+            'single_choice' => 'Одиночний вибір',
+            'multiple_choice' => 'Множинний вибір', 
+            'fill_in_the_blank' => 'Заповнення пропусків',
+            'matching' => 'Співставлення'
+        ];
+
+        return $typeNames[$this->type] ?? ucfirst(str_replace('_', ' ', $this->type));
+    }
 } 

@@ -28,18 +28,19 @@ class BlockElement extends Model
 
     /**
      * Получает контент с обработанными ссылками на персоналии
-     *
-     * @return string
      */
     public function getProcessedContentAttribute(): string
     {
-        return process_figure_links($this->content ?? '', true);
+        $context = $this->isFromControlBlock() ? 'control_block' : null;
+
+        // Используем прямой вызов сервиса, так как хелпер может зависать
+        $service = app(\App\Services\FigureLinkService::class);
+
+        return $service->processHtml($this->content ?? '', $context);
     }
 
     /**
      * Получает ключевые слова с обработанными ссылками на термины
-     *
-     * @return array|null
      */
     public function getProcessedKeywordsAttribute(): ?array
     {
@@ -49,12 +50,26 @@ class BlockElement extends Model
 
         // Декодируем JSON для ключевых слов
         $keywords = json_decode($this->content, true);
-        if (!is_array($keywords)) {
+        if (! is_array($keywords)) {
             return null;
         }
 
-        return array_map(function($keyword) {
-            return process_figure_links($keyword, true);
+        $context = $this->isFromControlBlock() ? 'control_block' : null;
+        $service = app(\App\Services\FigureLinkService::class);
+
+        return array_map(function ($keyword) use ($service, $context) {
+            return $service->processHtml($keyword, $context);
         }, $keywords);
+    }
+
+    /**
+     * Проверяет, принадлежит ли элемент к контрольному блоку или блоку домашних заданий
+     */
+    public function isFromControlBlock(): bool
+    {
+        return in_array($this->block_elementable_type, [
+            'App\Models\ControlBlock',
+            'App\Models\HomeworkBlock'
+        ]);
     }
 }

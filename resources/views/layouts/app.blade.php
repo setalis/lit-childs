@@ -167,13 +167,17 @@
                         --}}
                     </a>
                 </div>
-                <nav class="hidden md:flex space-x-6 lg:space-x-8 ">
-                    <a href="{{ route('sections.index') }}" class="text-gray-700 hover:text-[#3A6EA5] px-3 py-2 rounded-md text-sm font-medium">ЗМІСТ</a>
-                    <!-- <a href="{{ route('dictionary.index') }}" class="text-gray-700 hover:text-[#3A6EA5] px-3 py-2 rounded-md text-sm font-medium">СЛОВНИК ДОВІДНИК</a> -->
-                    <a href="{{ route('figures.index') }}" class="text-gray-700 hover:text-[#3A6EA5] px-3 py-2 rounded-md text-sm font-medium">ПЕРСОНАЛІЇ</a>
-                    <a href="{{ route('terms.index') }}" class="text-gray-700 hover:text-[#3A6EA5] px-3 py-2 rounded-md text-sm font-medium">СЛОВНИК-ДОВІДНИК</a>
-                    <a href="{{ route('mediacontent.index') }}" class="text-gray-700 hover:text-[#3A6EA5] px-3 py-2 rounded-md text-sm font-medium">МЕДІА КОНТЕНТ</a>
-                    <a href="{{ route('literature') }}" class="text-gray-700 hover:text-[#3A6EA5] px-3 py-2 rounded-md text-sm font-medium">РЕКОМЕНДОВАНА ЛІТЕРАТУРА</a>
+
+
+                
+                <nav class="hidden md:flex space-x-4  text-sm">
+                    <a href="{{ route('home') }}" class="text-gray-700 hover:text-[#3A6EA5] px-3 py-2 rounded-md font-medium">ГОЛОВНА</a>
+                    <a href="{{ route('sections.index') }}" class="text-gray-700 hover:text-[#3A6EA5] px-3 py-2 rounded-md font-medium">ЗМІСТ</a>
+                    <a href="{{ route('figures.index') }}" class="text-gray-700 hover:text-[#3A6EA5] px-3 py-2 rounded-md font-medium">ПЕРСОНАЛІЇ</a>
+                    <a href="{{ route('terms.index') }}" class="text-gray-700 hover:text-[#3A6EA5] px-3 py-2 rounded-md font-medium">СЛОВНИК-ДОВІДНИК</a>
+                    <a href="{{ route('tests.index') }}" class="text-gray-700 hover:text-[#3A6EA5] px-3 py-2 rounded-md font-medium">ТЕСТИ</a>
+                    <a href="{{ route('mediacontent.index') }}" class="text-gray-700 hover:text-[#3A6EA5] px-3 py-2 rounded-md font-medium">МЕДІА КОНТЕНТ</a>
+                    <a href="{{ route('literature') }}" class="text-gray-700 hover:text-[#3A6EA5] px-3 py-2 rounded-md font-medium">ЛІТЕРАТУРА</a>
                 </nav>
                 {{-- Mobile menu button --}}
                 <div class="md:hidden">
@@ -192,6 +196,7 @@
                 <a href="{{ route('dictionary.index') }}" class="text-gray-700 hover:text-[#3A6EA5] block px-3 py-2 rounded-md text-base font-medium">СЛОВНИК ДОВІДНИК</a>
                 <a href="{{ route('figures.index') }}" class="text-gray-700 hover:text-[#3A6EA5] block px-3 py-2 rounded-md text-base font-medium">ПЕРСОНАЛІЇ</a>
                 <a href="{{ route('terms.index') }}" class="text-gray-700 hover:text-[#3A6EA5] block px-3 py-2 rounded-md text-base font-medium">СЛОВНИК</a>
+                <a href="{{ route('tests.index') }}" class="text-gray-700 hover:text-[#3A6EA5] block px-3 py-2 rounded-md text-base font-medium">ТЕСТИ</a>
                 <a href="{{ route('mediacontent.index') }}" class="text-gray-700 hover:text-[#3A6EA5] block px-3 py-2 rounded-md text-base font-medium">МЕДІА КОНТЕНТ</a>
                 <a href="{{ route('literature') }}" class="text-gray-700 hover:text-[#3A6EA5] block px-3 py-2 rounded-md text-base font-medium">РЕКОМЕНДОВАНА ЛІТЕРАТУРА</a>
             </div>
@@ -267,16 +272,17 @@
     </script>
     
     <script>
-        // Простой скрипт для мобильного меню, если не используется Alpine.js или подобное
-        // document.addEventListener('DOMContentLoaded', function () {
-        //     const menuButton = document.querySelector('[aria-label="Toggle menu"]');
-        //     const mobileMenu = document.getElementById('mobile-menu');
-        //     if (menuButton && mobileMenu) {
-        //         menuButton.addEventListener('click', function () {
-        //             mobileMenu.classList.toggle('hidden');
-        //         });
-        //     }
-        // });
+        // Простой скрипт для мобильного меню
+        document.addEventListener('DOMContentLoaded', function () {
+            const menuButton = document.querySelector('[aria-label="Toggle menu"]');
+            const mobileMenu = document.getElementById('mobile-menu');
+            if (menuButton && mobileMenu) {
+                menuButton.addEventListener('click', function () {
+                    mobileMenu.classList.toggle('hidden');
+                });
+            }
+        });
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
 </body>
 </html> 

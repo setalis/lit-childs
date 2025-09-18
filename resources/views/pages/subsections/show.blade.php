@@ -20,12 +20,12 @@
 <div class="container mx-auto px-4 sm:px-6 lg:px-8 pb-8 pt-4">
     {{-- Хлебные крошки --}}
     <nav class="mb-16 text-sm text-gray-500" aria-label="Breadcrumb">
-        <ol class="list-none p-0 inline-flex space-x-2">
-            <li><a href="{{ route('home') }}" class="text-[#3A6EA5] hover:underline">Головна</a></li>
-            <li><span>/</span></li>
-            <li><a href="{{ route('sections.index') }}" class="text-[#3A6EA5] hover:underline">Зміст</a></li>
-            <li><span>/</span></li>
-            <li><a href="{{ route('sections.show', $subsection->section) }}" class="text-[#3A6EA5] hover:underline">{{ $subsection->section->title }}</a></li>
+        <ol class="inline-flex items-center space-x-1 md:space-x-2 rtl:space-x-reverse">
+            <li class="inline-flex items-center"><a href="{{ route('home') }}" class="text-[#3A6EA5] hover:underline">Головна</a></li>
+            <li class="inline-flex items-center"><span>/</span></li>
+            <li class="inline-flex items-center"><a href="{{ route('sections.index') }}" class="text-[#3A6EA5] hover:underline">Зміст</a></li>
+            <li class="inline-flex items-center"><span>/</span></li>
+            <li class="inline-flex items-center"><a href="{{ route('sections.show', $subsection->section) }}" class="text-[#3A6EA5] hover:underline">{{ $subsection->section->title }}</a></li>
             <li><span>/</span></li>
             <li class="text-gray-700" aria-current="page">{{ $subsection->title }}</li>
         </ol>

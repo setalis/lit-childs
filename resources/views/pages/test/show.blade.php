@@ -92,7 +92,7 @@
                     <h3 class="text-xl font-semibold mb-2">
                         Питання {{ $index + 1 }}
                         <span class="text-sm opacity-75 ml-2">
-                            ({{ ucfirst(str_replace('_', ' ', $question->type)) }})
+                            ({{ $question->type_display }})
                         </span>
                     </h3>
                     <p class="text-lg">{!! $question->text !!}</p>

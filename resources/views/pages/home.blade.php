@@ -28,22 +28,21 @@
         background-image: url("{{ asset('storage/dictionary-bg.jpg') }}"); /* Фон для блока словаря */
         background-size: 40%;
         background-position: center;
-        border-radius: 0.5rem; /* rounded-lg */
     
     }
-    .block-bg-personalities {
+    /* .block-bg-personalities {
         background-image: url("{{ asset('images/personalities-bg.png') }}"); /* Фон для блока персоналий */
         background-size: cover;
         background-position: center;
         border-radius: 0.5rem; /* rounded-lg */
-    }
+    } */
 </style>
 @endpush
 
 @section('content')
     {{-- Hero Section --}}
     <section class="hero-bg flex items-center h-full lg:py-38 py-24 -mt-16 border-b border-yellow-300">
-        <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center md:text-left }}')]">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center md:text-left">
             <div class="md:w-2/3 lg:w-2/3">
                 <h3 class="text-lg sm:text-lg mb-4 leading-tight font-bold text-[#94BDDD] uppercase">Інна Хижняк,  Ольга Хващевська, Ірина Лобачова</h3>
                 <h1 class="text-3xl sm:text-4xl md:text-4xl font-bold leading-tight text-[#28569A] uppercase mb-8">Дитяча література з методикою навчання літературного читання</h1>
@@ -55,7 +54,7 @@
     </section>
 
     {{-- Sections Overview --}}
-    <section class="mt-24 ">
+    <section class="mt-24 pb-15">
         <div class="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <h2 class="text-5xl font-bold text-center mb-12 text-[#3A6EA5]">РОЗДІЛИ ПІДРУЧНИКА</h2>
             @if($sections->isEmpty())
@@ -141,9 +140,9 @@
                 {{-- Personalities Block --}}
                 <div class="bg-white p-8 md:p-12 flex flex-col md:flex-row justify-between items-start rounded-3xl border border-[#94BDDD]">
                     <div class="w-3/5">
-                        <h3 class="text-3xl font-bold mb-3">Персоналії</h3>
-                        <p class="mb-10 text-lg">Видатні письменники, науковці, критики, чий внесок у літературу є значущим.</p>
-                        <a href="{{ route('figures.index') }}" class="bg-[#FEC200] hover:bg-[#e0a800] rounded-full text-white px-8 py-4 uppercase font-bold">ПЕРЕЙТИ ДО ПЕРСОНАЛІЙ</a>
+                        <h3 class="text-3xl font-bold mb-3">Рекомендована література</h3>
+                        <p class="mb-10 text-lg">Рекомендована література для додаткового читання.</p>
+                        <a href="{{ route('literature') }}" class="bg-[#FEC200] hover:bg-[#e0a800] rounded-full text-white px-8 py-4 uppercase font-bold">Переглянути</a>
                     </div>
                     <div class="w-2/5">
                         <img src="{{ asset('storage/biblio-img.jpg') }}" alt="Медіаконтент" class="w-full">
@@ -161,7 +160,7 @@
                 <h2 class="text-3xl font-bold text-[#3A6EA5] mb-8 text-center md:text-left">ТЕСТОВІ ЗАВДАННЯ</h2>
                 <p class="text-gray-700 max-w-2xl mb-10 text-lg">Перевірте свої знання за допомогою інтерактивних тестів по кожному розділу та темі підручника.</p>
                 <div class="flex md:justify-start justify-center pt-2">
-                    <a href="#" class="bg-[#94BDDD] hover:bg-[#6a8eaa] rounded-full text-white px-8 py-4 uppercase font-bold">ПЕРЕЙТИ ДО ТЕСТІВ</a> {{-- Замените # на актуальный маршрут --}}
+                    <a href="{{ route('tests.index') }}" class="bg-[#94BDDD] hover:bg-[#6a8eaa] rounded-full text-white px-8 py-4 uppercase font-bold">ПЕРЕЙТИ ДО ТЕСТІВ</a> {{-- Замените # на актуальный маршрут --}}
                 </div>
             </div>
             <div class="w-1/2">

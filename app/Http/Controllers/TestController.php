@@ -8,6 +8,34 @@ use Illuminate\View\View;
 
 class TestController extends Controller
 {
+    public function index(): View
+    {
+        // Получаем все тесты с их связями
+        $tests = Test::with([
+            'controlBlocks.subsection.section',
+            'questions'
+        ])->get();
+
+        // Группируем тесты по разделам и подразделам
+        $groupedTests = $tests->groupBy(function ($test) {
+            $controlBlock = $test->controlBlocks->first();
+            if ($controlBlock && $controlBlock->subsection && $controlBlock->subsection->section) {
+                return $controlBlock->subsection->section->title;
+            }
+            return 'Без розділу';
+        })->map(function ($sectionTests, $sectionTitle) {
+            return $sectionTests->groupBy(function ($test) {
+                $controlBlock = $test->controlBlocks->first();
+                if ($controlBlock && $controlBlock->subsection) {
+                    return $controlBlock->subsection->title;
+                }
+                return 'Без підрозділу';
+            });
+        });
+
+        return view('pages.tests.index', compact('groupedTests'));
+    }
+
     public function tinymce()
     {
         return view('test.tinymce');
@@ -181,9 +209,26 @@ class TestController extends Controller
                 case 'multiple_choice':
                     $correctAnswers = $question->answers->where('is_correct', true)->pluck('id')->toArray();
                     $userAnswers = is_array($userAnswer) ? $userAnswer : [];
-                    $isCorrect = count($correctAnswers) === count($userAnswers) && 
-                                 count(array_diff($correctAnswers, $userAnswers)) === 0;
-                    $earnedQuestionPoints = $isCorrect ? 1 : 0;
+                    
+                    // Подсчитываем правильные ответы (1 балл за каждый правильный ответ)
+                    $correctAnswerCount = 0;
+                    $totalCorrectAnswers = count($correctAnswers);
+                    
+                    foreach ($correctAnswers as $correctAnswerId) {
+                        if (in_array($correctAnswerId, $userAnswers)) {
+                            $correctAnswerCount++;
+                        }
+                    }
+                    
+                    // Также проверяем, что пользователь не выбрал лишние неправильные ответы
+                    $wrongAnswers = array_diff($userAnswers, $correctAnswers);
+                    $hasWrongAnswers = count($wrongAnswers) > 0;
+                    
+                    $questionPoints = $totalCorrectAnswers; // Максимум баллов = количество правильных ответов
+                    $earnedQuestionPoints = $correctAnswerCount; // Заработанные баллы = количество правильных ответов
+                    
+                    // Вопрос считается полностью правильным только если выбраны все правильные ответы и нет неправильных
+                    $isCorrect = $correctAnswerCount === $totalCorrectAnswers && !$hasWrongAnswers;
                     break;
 
                 case 'fill_in_the_blank':
@@ -340,4 +385,6 @@ class TestController extends Controller
         
         return false;
     }
+
 }
+

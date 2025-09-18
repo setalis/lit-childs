@@ -23,7 +23,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         // Подключаем helper-функции
-        require_once app_path('Helpers/FigureLinkHelper.php');
+        require app_path('Helpers/FigureLinkHelper.php');
         
         // Регистрируем Blade директивы
         \Illuminate\Support\Facades\Blade::directive('figureLinks', function ($expression) {
