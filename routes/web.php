@@ -62,7 +62,14 @@ Route::get('/literature', function () {
     return view('pages.literature');
 })->name('literature');
 
+Route::get('/pre-speech', function () {
+    return view('pages.pre-speech');
+})->name('pre-speech');
+
 Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/', function () {
+        return view('dashboard');
+    })->name('admin.home');
     Route::get('/sections', AdminSectionsIndex::class)->name('sections.index');
     Route::get('/subsections', AdminSubsectionsIndex::class)->name('subsections.index');
     Route::get('/subsections/{subsection}/content', AdminSubsectionsManageContent::class)->name('subsections.content');

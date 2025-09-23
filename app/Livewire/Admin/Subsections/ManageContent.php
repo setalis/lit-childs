@@ -129,7 +129,9 @@ class ManageContent extends Component
                 'element_id' => $this->editingBlockElementId
             ]);
         } elseif ($this->elementType === 'keywords') {
-            $content = $this->elementContentKeywords;
+            // Сохраняем ключевые слова как JSON-массив
+            $keywords = array_filter(array_map('trim', explode(',', $this->elementContentKeywords)));
+            $content = json_encode($keywords, JSON_UNESCAPED_UNICODE);
         } elseif ($this->elementType === 'list') {
             // Сохраняем список как JSON-массив
             $lines = array_filter(array_map('trim', explode("\n", $this->elementContentList)));

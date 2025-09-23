@@ -13,7 +13,6 @@
     }
     
     .section-header {
-        background: linear-gradient(135deg, #3A6EA5 0%, #2C5A8A 100%);
         color: white;
         padding: 1.5rem 2rem;
         cursor: pointer;
@@ -21,7 +20,60 @@
     }
     
     .section-header:hover {
-        background: linear-gradient(135deg, #2C5A8A 0%, #1E4A7A 100%);
+        opacity: 0.9;
+        transform: translateY(-1px);
+    }
+    
+    /* Цвета для разных разделов */
+    .section-header.color-1 {
+        background: linear-gradient(135deg, #3A6EA5 0%, #2C5A8A 100%);
+    }
+    
+    .section-header.color-2 {
+        background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+    }
+    
+    .section-header.color-3 {
+        background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+    }
+    
+    .section-header.color-4 {
+        background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+    }
+    
+    .section-header.color-5 {
+        background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+    }
+    
+    .section-header.color-6 {
+        background: linear-gradient(135deg, #EC4899 0%, #DB2777 100%);
+    }
+    
+    .section-header.color-7 {
+        background: linear-gradient(135deg, #06B6D4 0%, #0891B2 100%);
+    }
+    
+    .section-header.color-8 {
+        background: linear-gradient(135deg, #84CC16 0%, #65A30D 100%);
+    }
+    
+    .section-header.color-9 {
+        background: linear-gradient(135deg, #F97316 0%, #EA580C 100%);
+    }
+    
+    .section-header.color-10 {
+        background: linear-gradient(135deg, #6366F1 0%, #4F46E5 100%);
+    }
+    
+    /* Стили для аккордеона */
+    [data-accordion-target] {
+        background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+        color: white;
+        transition: background 0.3s ease;
+    }
+    
+    [data-accordion-target][aria-expanded="true"] {
+        background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
     }
     
     .section-title {
@@ -172,11 +224,47 @@
 @endpush
 
 @section('content')
-<div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <div class="page-header">
-        <h1 class="page-title">ЗМІСТ ПІДРУЧНИКА</h1>
-        <p class="page-subtitle">Повна структура навчального матеріалу з теоретичними та практичними блоками</p>
+<div class="flex flex-col items-center justify-center border-b border-yellow-500 ">
+    <div class="container flex flex-col md:flex-row mx-auto lg:px-8 px-4">
+        <div class="w-3/4 flex flex-col justify-center">
+            <h1 class="text-4xl font-bold mb-4 uppercase text-[#28569A]">Зміст підручника</h1>
+            <h2 class="text-xl font-bold mb-4 uppercase">Повна структура навчального матеріалу з теоретичними та практичними блоками</h2>
+        </div>
+        <div class="w-1/4 flex flex-col items-center justify-center">
+            <div class="flex flex-col items-center justify-center">
+                <img src="{{ asset('storage/header-1.png') }}" alt="Section 1" class="w-full h-auto">
+            </div>
+        </div>
     </div>
+</div>
+<div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    
+<div id="accordion-collapse" data-accordion="collapse" class="w-full mb-8">
+    <h2 id="accordion-collapse-heading-1">
+        <button type="button" class="flex items-center justify-between w-full p-5 font-medium rtl:text-right rounded-t-xl bg-amber-500 shadow-xl px-8" data-accordion-target="#accordion-collapse-body-1" aria-expanded="false" aria-controls="accordion-collapse-body-1">
+        <span class="section-title uppercase font-bold font-xl !font-serif">Передмова</span>
+            <div class="flex items-center justify-center w-8 h-8 rounded-full bg-amber-500 ">
+                <svg data-accordion-icon class="w-4 h-4 rotate-180 shrink-0 transition-all duration-300" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/>
+                </svg>
+            </div>
+        </button>
+    </h2>
+    <div id="accordion-collapse-body-1" class="hidden rounded-xl bg-white shadow-xl" aria-labelledby="accordion-collapse-heading-1">
+        <div class="p-5 border border-b-0 border-gray-200 dark:border-gray-700 dark:bg-gray-900">
+        <p class="mb-2 text-gray-500 dark:text-gray-400">Початкова школа є важливою ланкою літературної освіти, забезпечуючи базові знання, уміння та навички, що вможливлюють надалі ефективну читацьку діяльність на уроках літератури та опанування всіх інших освітніх галузей, адже читання з розумінням або усвідомлене читання в нормативних документах України та світу віднесено до наскрізних умінь особистості, що забезпечує доброякісність усієї її освітньої та суспільної діяльності.</p>
+        <p class="mb-2 text-gray-500 dark:text-gray-400">Навчальна дисципліна «Дитяча література з методикою навчання літературного читання» спрямована на формування в майбутніх учителів початкових класів повноцінного сприйняття літератури як мистецтва слова, розуміння специфіки дитячої літератури; розвиток навички оцінки й інтерпретації художніх творів; розкриття та усвідомлення здобувачами освіти сутності процесу навчання літературного читання в початковій школі відповідно до вимог Державного стандарту початкової освіти.</p>
+
+        <p class="mb-2 text-gray-500 dark:text-gray-400">Украй вагомим для майбутнього педагога початкової школи, який у своєму професійному становленні має опанувати теоретичний та практичний базис методики навчання літературного читання, є знати і розуміти сутність сучасних тенденцій розвитку цієї науки. Цифровий підручник «Дитяча література з методикою навчання літературного читання» покликаний забезпечити ефективне опанування матеріалу через зручну навігацію та інтерактивні інструменти, що сприяють активній взаємодії здобувачів освіти з текстом і розвитку їхньої читацької компетентності.</p>
+
+        <p class="mb-2 text-gray-500 dark:text-gray-400">Інтерактивна структура теоретичного матеріалу підручника, зокрема використання внутрішніх гіперпосилань на тексти науково-методичних джерел, збірники вправ і завдань із читання, літературні твори, аудіо- та відеозаписи з виконанням художніх творів та уроків (фрагментів уроків) літературного читання в початковій школі з обов'язковим зазначенням авторства та/або джерела; зовнішніх посилань, що пов'язані з текстами публікацій у наукових виданнях, які містяться на сайтах видавництв та/або мають DOI, а також нормативних документів та навчально-методичного забезпечення освітнього процесу на уроках літературного читання в початковій школі, які постійно оновлюються на сайтах МОН, ІМЗО та ін.: чинний Державний стандарт початкової освіти, Типові освітні та навчальні програми з читання (1–2 класи) і літературного читання (3–4 класи), підручники і посібники з грифом МОН тощо; рівневість практичних та самостійних завдань уможливлює легке вивчення навчального матеріалу, бо враховує принцип індивідуалізації та диференціації навчання: автономія здобувача освіти у виборі обсягу та траєкторії сприймання матеріалу, рівня та кількості завдань; а демократичність реалізується через включення ситуації вибору у зміст практичних і самостійних робіт, що надає змогу обирати ті завдання, які найбільше відповідають інтересам здобувачів освіти. У такий спосіб цифровий підручник «Дитяча література з методикою навчання літературного читання» надає змогу здобувачам вищої освіти самостійно поглиблювати знання, формувати критичне ставлення до інформації та вибудовувати власну освітню траєкторію відповідно до індивідуальних потреб і можливостей.</p>
+
+        <p class="mb-2 text-gray-500 dark:text-gray-400">Цифровий підручник «Дитяча література з методикою навчання літературного читання» призначений для підготовки здобувачів вищої освіти спеціальності А3 Початкова освіта до професійної діяльності, оволодіння теоретичними знаннями та формування практичних умінь з організації освітнього процесу на уроках літературного читання в початковій школі.</p>
+
+        </div>
+    </div>  
+</div>
+
 
     @if($sections->isEmpty())
         <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-6 rounded-lg" role="alert">
@@ -185,11 +273,14 @@
         </div>
     @else
         <div class="sections-list">
-            @foreach($sections as $section)
+            @foreach($sections as $index => $section)
+                @php
+                    $colorClass = 'color-' . (($index % 10) + 1);
+                @endphp
                 <div class="section-container">
-                    <div class="section-header" onclick="toggleSection({{ $section->id }})">
+                    <div class="section-header {{ $colorClass }}" onclick="toggleSection({{ $section->id }})">
                         <h2 class="section-title">
-                            {{ $section->title }}
+                            Розділ {{$section->order}}.  {{ $section->title }}
                             <button class="section-toggle" id="toggle-{{ $section->id }}">
                                 <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
                                     <path d="M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/>
