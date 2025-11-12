@@ -2,26 +2,31 @@
 
 namespace App\Livewire\Admin\Tests;
 
-use Livewire\Component;
 use App\Models\Test;
 use App\Models\TestQuestion;
-use App\Models\TestAnswer;
-use App\Models\TestMatchPair;
+use Livewire\Component;
 
 class Index extends Component
 {
     public $showModal = false;
+
     public $editingId = null;
+
     public $title = '';
+
     public $description = '';
+
     public $order = 0;
+
     public $questions = [];
+
     public $questionTypes = [
         'single_choice' => 'Один правильний варіант',
         'multiple_choice' => 'Кілька правильних варіантів',
         'fill_in_the_blank' => 'Дописати відповідь',
         'matching' => 'Встановити відповідність',
     ];
+
     public $collapsedQuestions = [];
 
     protected $rules = [
@@ -44,10 +49,10 @@ class Index extends Component
         $this->title = $test->title;
         $this->description = $test->description;
         $this->order = $test->order;
-        
+
         $this->showModal = true;
         $this->dispatch('init-test-tinymce');
-        
+
         $this->questions = [];
         foreach ($test->questions as $q) {
             $item = [
@@ -86,6 +91,7 @@ class Index extends Component
                         'id' => $pair->id,
                         'left_text' => $pair->left_text,
                         'right_text' => $pair->right_text,
+                        'is_distractor' => $pair->is_distractor ?? false,
                     ];
                 }
             }
@@ -134,6 +140,7 @@ class Index extends Component
             'id' => null,
             'left_text' => '',
             'right_text' => '',
+            'is_distractor' => false,
         ];
     }
 
@@ -144,7 +151,7 @@ class Index extends Component
 
     public function toggleCollapseQuestion($index)
     {
-        $this->collapsedQuestions[$index] = !$this->collapsedQuestions[$index];
+        $this->collapsedQuestions[$index] = ! $this->collapsedQuestions[$index];
     }
 
     public function collapseAllQuestions()
@@ -159,27 +166,27 @@ class Index extends Component
 
     public function detectBlanks($qIndex)
     {
-        if (!isset($this->questions[$qIndex])) {
+        if (! isset($this->questions[$qIndex])) {
             return;
         }
 
         $questionText = $this->questions[$qIndex]['text'] ?? '';
-        
+
         // Находим все пропуски в формате [1], [2], [3] и т.д.
         preg_match_all('/\[(\d+)\]/', $questionText, $matches);
-        
-        if (!empty($matches[1])) {
+
+        if (! empty($matches[1])) {
             // Получаем уникальные номера пропусков и сортируем их
             $blankNumbers = array_unique($matches[1]);
             sort($blankNumbers, SORT_NUMERIC);
-            
+
             $this->questions[$qIndex]['detected_blanks'] = $blankNumbers;
-            
+
             // Инициализируем массив ответов если его нет
-            if (!isset($this->questions[$qIndex]['answers'])) {
+            if (! isset($this->questions[$qIndex]['answers'])) {
                 $this->questions[$qIndex]['answers'] = [];
             }
-            
+
             // Создаем поля для ответов если их не хватает
             foreach ($blankNumbers as $index => $blankNumber) {
                 // Проверяем, есть ли уже ответ для этой позиции
@@ -190,8 +197,8 @@ class Index extends Component
                         break;
                     }
                 }
-                
-                if (!$hasAnswerForPosition) {
+
+                if (! $hasAnswerForPosition) {
                     $this->questions[$qIndex]['answers'][] = [
                         'text' => '',
                         'is_correct' => true,
@@ -206,12 +213,12 @@ class Index extends Component
 
     public function addBlankVariant($qIndex, $blankIndex)
     {
-        if (!isset($this->questions[$qIndex]['detected_blanks'][$blankIndex])) {
+        if (! isset($this->questions[$qIndex]['detected_blanks'][$blankIndex])) {
             return;
         }
 
         $blankNumber = $this->questions[$qIndex]['detected_blanks'][$blankIndex];
-        
+
         $this->questions[$qIndex]['answers'][] = [
             'text' => '',
             'is_correct' => true,
@@ -238,12 +245,12 @@ class Index extends Component
     public function save()
     {
         $this->validate();
-        
+
         // Отладочная информация
         logger('Сохранение теста:', [
             'description' => $this->description,
             'description_length' => strlen($this->description),
-            'contains_html' => strpos($this->description, '<') !== false
+            'contains_html' => strpos($this->description, '<') !== false,
         ]);
         if ($this->editingId) {
             $test = Test::findOrFail($this->editingId);
@@ -277,14 +284,14 @@ class Index extends Component
                 foreach ($q['answers'] as $a) {
                     $question->answers()->create([
                         'text' => $a['text'],
-                        'is_correct' => !empty($a['is_correct']),
+                        'is_correct' => ! empty($a['is_correct']),
                     ]);
                 }
             } elseif ($q['type'] === 'fill_in_the_blank') {
                 // Обрабатываем множественные пропуски
-                if (isset($q['detected_blanks']) && !empty($q['detected_blanks'])) {
+                if (isset($q['detected_blanks']) && ! empty($q['detected_blanks'])) {
                     foreach ($q['detected_blanks'] as $blankIndex => $blankNumber) {
-                        if (!empty($q['answers'][$blankIndex]['text'])) {
+                        if (! empty($q['answers'][$blankIndex]['text'])) {
                             $question->answers()->create([
                                 'text' => $q['answers'][$blankIndex]['text'],
                                 'is_correct' => true,
@@ -295,7 +302,7 @@ class Index extends Component
                     }
                 } else {
                     // Fallback для старого формата (один пропуск)
-                    if (!empty($q['answers'][0]['text'])) {
+                    if (! empty($q['answers'][0]['text'])) {
                         $question->answers()->create([
                             'text' => $q['answers'][0]['text'],
                             'is_correct' => true,
@@ -305,10 +312,17 @@ class Index extends Component
                 }
             } elseif ($q['type'] === 'matching') {
                 foreach ($q['match_pairs'] as $pair) {
-                    $question->matchPairs()->create([
-                        'left_text' => $pair['left_text'],
-                        'right_text' => $pair['right_text'],
-                    ]);
+                    // Пропускаємо порожні пари (обидва поля порожні)
+                    $leftText = ! empty($pair['left_text']) ? $pair['left_text'] : null;
+                    $rightText = ! empty($pair['right_text']) ? $pair['right_text'] : null;
+
+                    if ($leftText !== null || $rightText !== null) {
+                        $question->matchPairs()->create([
+                            'left_text' => $leftText,
+                            'right_text' => $rightText,
+                            'is_distractor' => $pair['is_distractor'] ?? false,
+                        ]);
+                    }
                 }
             }
         }
@@ -340,6 +354,7 @@ class Index extends Component
     public function render()
     {
         $tests = Test::orderBy('order')->get();
+
         return view('livewire.admin.tests.index', compact('tests'));
     }
 }

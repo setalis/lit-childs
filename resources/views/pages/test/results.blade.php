@@ -288,27 +288,58 @@
                                 <h5 class="font-medium text-gray-700 mb-3">Детальні результати по парах:</h5>
                                 @foreach($result['question']->matchPairs as $pair)
                                     @php
-                                        $userAnswer = is_array($result['user_answer']) ? ($result['user_answer'][$pair->left_text] ?? null) : null;
-                                        $isCorrectPair = $userAnswer === $pair->right_text;
+                                        // Визначаємо, чи є це відволікаючий елемент
+                                        $isLeftDistractor = $pair->left_text !== null && $pair->right_text === null;
+                                        $isRightDistractor = $pair->left_text === null && $pair->right_text !== null;
+                                        $isDistractor = $isLeftDistractor || $isRightDistractor;
+                                        
+                                        // Для повних пар перевіряємо відповідь користувача
+                                        $userAnswer = null;
+                                        $isCorrectPair = false;
+                                        
+                                        if (!$isDistractor && $pair->left_text !== null) {
+                                            $userAnswer = is_array($result['user_answer']) ? ($result['user_answer'][$pair->left_text] ?? null) : null;
+                                            $isCorrectPair = $userAnswer === $pair->right_text;
+                                        }
                                     @endphp
                                     <div class="flex items-center justify-between p-3 rounded-lg border 
-                                        {{ $isCorrectPair ? 'bg-green-100 border-green-300' : 'bg-red-100 border-red-300' }}">
+                                        @if($isDistractor)
+                                            bg-gray-100 border-gray-300
+                                        @elseif($isCorrectPair)
+                                            bg-green-100 border-green-300
+                                        @else
+                                            bg-red-100 border-red-300
+                                        @endif">
                                         <div class="flex-1">
-                                            <span class="font-medium">{{ $pair->left_text }}</span>
-                                            <span class="mx-2">↔</span>
-                                            <span class="
-                                                {{ $isCorrectPair ? 'text-green-800' : 'text-red-800' }}
-                                            ">
-                                                {{ $userAnswer ?? '(не обрано)' }}
-                                            </span>
-                                            @if(!$isCorrectPair && $userAnswer)
-                                                <span class="text-sm text-gray-600 ml-3">
-                                                    (правильно: <strong>{{ $pair->right_text }}</strong>)
+                                            @if($isLeftDistractor)
+                                                <span class="font-medium">{{ $pair->left_text }}</span>
+                                                <span class="mx-2">—</span>
+                                                <span class="text-gray-600 italic">(відволікаючий елемент ліворуч)</span>
+                                            @elseif($isRightDistractor)
+                                                <span class="text-gray-600 italic">(відволікаючий елемент праворуч:</span>
+                                                <span class="font-medium ml-1">{{ $pair->right_text }}</span>
+                                                <span class="text-gray-600 italic">)</span>
+                                            @else
+                                                <span class="font-medium">{{ $pair->left_text }}</span>
+                                                <span class="mx-2">↔</span>
+                                                <span class="
+                                                    {{ $isCorrectPair ? 'text-green-800' : 'text-red-800' }}
+                                                ">
+                                                    {{ $userAnswer ?? '(не обрано)' }}
                                                 </span>
+                                                @if(!$isCorrectPair && $userAnswer)
+                                                    <span class="text-sm text-gray-600 ml-3">
+                                                        (правильно: <strong>{{ $pair->right_text }}</strong>)
+                                                    </span>
+                                                @endif
                                             @endif
                                         </div>
                                         <div class="ml-4">
-                                            @if($isCorrectPair)
+                                            @if($isDistractor)
+                                                <svg class="w-5 h-5 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                                </svg>
+                                            @elseif($isCorrectPair)
                                                 <svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
                                                     <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
                                                 </svg>

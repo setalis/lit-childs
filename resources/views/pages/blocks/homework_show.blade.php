@@ -47,7 +47,7 @@
 <div class="flex flex-col items-center justify-center border-b border-yellow-500 mb-8">
     <div class="container flex flex-col md:flex-row mx-auto lg:px-8 px-4">
         <div class="w-3/4 flex flex-col justify-center">
-            <h1 class="text-4xl font-bold mb-4 uppercase text-[#28569A]">Самостійна робота</h1>
+            <h1 class="text-4xl font-bold mb-4 uppercase text-[#28569A]">Самостійна робота {{ $subsection->section->order }}.{{ $subsection->order }}</h1>
             <h2 class="text-lg sm:text-lg font-bold mb-4 uppercase text-gray-600">{{ $subsection->title }}</h2>
         </div>
         <div class="w-1/4 flex flex-col items-center justify-center">

@@ -14,6 +14,7 @@ class TestMatchPair extends Model
         'question_id',
         'left_text',
         'right_text',
+        'is_distractor',
         'order',
     ];
 
@@ -21,4 +22,4 @@ class TestMatchPair extends Model
     {
         return $this->belongsTo(TestQuestion::class, 'question_id');
     }
-} 
+}

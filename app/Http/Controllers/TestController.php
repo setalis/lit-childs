@@ -13,7 +13,7 @@ class TestController extends Controller
         // Получаем все тесты с их связями
         $tests = Test::with([
             'controlBlocks.subsection.section',
-            'questions'
+            'questions',
         ])->get();
 
         // Группируем тесты по разделам и подразделам
@@ -22,6 +22,7 @@ class TestController extends Controller
             if ($controlBlock && $controlBlock->subsection && $controlBlock->subsection->section) {
                 return $controlBlock->subsection->section->title;
             }
+
             return 'Без розділу';
         })->map(function ($sectionTests, $sectionTitle) {
             return $sectionTests->groupBy(function ($test) {
@@ -29,6 +30,7 @@ class TestController extends Controller
                 if ($controlBlock && $controlBlock->subsection) {
                     return $controlBlock->subsection->title;
                 }
+
                 return 'Без підрозділу';
             });
         });
@@ -46,15 +48,19 @@ class TestController extends Controller
         // Загружаем тест с вопросами, ответами и парами для сопоставления
         $test->load([
             'questions.answers',
-            'questions.matchPairs'
+            'questions.matchPairs',
         ]);
 
         // Перемешиваем правую колонку для вопросов типа "matching"
         $test->questions->each(function ($question) {
             if ($question->type === 'matching' && $question->matchPairs->isNotEmpty()) {
-                // Создаем коллекцию правых элементов и перемешиваем её
-                $rightItems = $question->matchPairs->pluck('right_text')->shuffle();
-                
+                // Собираем все правые элементы (включая отвлекающие)
+                // Правый элемент существует, если right_text не null
+                $rightItems = $question->matchPairs
+                    ->whereNotNull('right_text')
+                    ->pluck('right_text')
+                    ->shuffle();
+
                 // Присваиваем перемешанную коллекцию обратно как свойство
                 $question->shuffled_right_items = $rightItems->values();
             }
@@ -70,13 +76,13 @@ class TestController extends Controller
     {
         // Убираем лишние пробелы и приводим к нижнему регистру
         $normalized = trim(mb_strtolower($text, 'UTF-8'));
-        
+
         // Убираем множественные пробелы
         $normalized = preg_replace('/\s+/', ' ', $normalized);
-        
+
         // Убираем знаки препинания
         $normalized = preg_replace('/[^\w\s\d]/u', '', $normalized);
-        
+
         return $normalized;
     }
 
@@ -87,44 +93,48 @@ class TestController extends Controller
     {
         $userNormalized = $this->normalizeText($userAnswer);
         $correctNormalized = $this->normalizeText($correctAnswer);
-        
+
         // Точное совпадение
         if ($userNormalized === $correctNormalized) {
             \Log::info("Exact match: '{$userAnswer}' === '{$correctAnswer}'");
+
             return true;
         }
-        
+
         // Проверка схожести (для окончаний) - только для длинных слов
         $minLength = min(mb_strlen($userNormalized), mb_strlen($correctNormalized));
-        
+
         if ($minLength >= 6) { // Только для слов длиной 6+ символов
             $similarity = 0;
             similar_text($userNormalized, $correctNormalized, $similarity);
-            
+
             \Log::info("Similarity check: '{$userAnswer}' vs '{$correctAnswer}' = {$similarity}%");
-            
+
             // Для длинных слов: схожесть 90%+ и разница не более 2 символов
             if ($similarity >= 90 && abs(mb_strlen($userNormalized) - mb_strlen($correctNormalized)) <= 2) {
                 \Log::info("Similarity match (90%+): '{$userAnswer}' vs '{$correctAnswer}'");
+
                 return true;
             }
         }
-        
+
         // Проверка на основу слова (первые 80% символов совпадают) - только для длинных слов
         if ($minLength >= 5) {
-            $baseLength = (int)($minLength * 0.8); // Увеличиваем до 80%
+            $baseLength = (int) ($minLength * 0.8); // Увеличиваем до 80%
             $userBase = mb_substr($userNormalized, 0, $baseLength);
             $correctBase = mb_substr($correctNormalized, 0, $baseLength);
-            
+
             \Log::info("Base check: '{$userBase}' vs '{$correctBase}' (first {$baseLength} chars, min length: {$minLength})");
-            
+
             if ($userBase === $correctBase && $baseLength >= 4) { // Минимум 4 символа должны совпадать
                 \Log::info("Base match: '{$userAnswer}' vs '{$correctAnswer}'");
+
                 return true;
             }
         }
-        
+
         \Log::info("No match: '{$userAnswer}' vs '{$correctAnswer}'");
+
         return false;
     }
 
@@ -139,48 +149,50 @@ class TestController extends Controller
             $totalBlanks = $uniquePositions->count();
             $correctBlankCount = 0;
             $blankResults = []; // Для детального отслеживания каждого пропуска
-            
+
             foreach ($uniquePositions as $blankPosition) {
                 $userText = $userAnswer[$blankPosition] ?? '';
                 $correctAnswersForPosition = $correctAnswers->where('blank_position', $blankPosition);
                 $isBlankCorrect = false;
-                
+
                 foreach ($correctAnswersForPosition as $correctAnswer) {
                     if ($this->isSimilarText($userText, $correctAnswer->text)) {
                         $isBlankCorrect = true;
                         break; // Найден правильный ответ для этой позиции
                     }
                 }
-                
+
                 if ($isBlankCorrect) {
                     $correctBlankCount++;
                 }
-                
+
                 $blankResults[$blankPosition] = $isBlankCorrect;
             }
-            
+
             return [
                 'is_correct' => $correctBlankCount === $totalBlanks && $totalBlanks > 0,
                 'earned_points' => $correctBlankCount,
                 'max_points' => $totalBlanks,
-                'blank_results' => $blankResults // Добавляем детальные результаты
+                'blank_results' => $blankResults, // Добавляем детальные результаты
             ];
         } else {
             // Один пропуск (старый формат)
-            foreach ($correctAnswers as $correctAnswer) {
-                if ($this->isSimilarText($userAnswer, $correctAnswer->text)) {
-                    return [
-                        'is_correct' => true,
-                        'earned_points' => 1,
-                        'max_points' => 1
-                    ];
+            if ($userAnswer !== null && $userAnswer !== '') {
+                foreach ($correctAnswers as $correctAnswer) {
+                    if ($this->isSimilarText($userAnswer, $correctAnswer->text)) {
+                        return [
+                            'is_correct' => true,
+                            'earned_points' => 1,
+                            'max_points' => 1,
+                        ];
+                    }
                 }
             }
-            
+
             return [
                 'is_correct' => false,
                 'earned_points' => 0,
-                'max_points' => 1
+                'max_points' => 1,
             ];
         }
     }
@@ -209,26 +221,26 @@ class TestController extends Controller
                 case 'multiple_choice':
                     $correctAnswers = $question->answers->where('is_correct', true)->pluck('id')->toArray();
                     $userAnswers = is_array($userAnswer) ? $userAnswer : [];
-                    
+
                     // Подсчитываем правильные ответы (1 балл за каждый правильный ответ)
                     $correctAnswerCount = 0;
                     $totalCorrectAnswers = count($correctAnswers);
-                    
+
                     foreach ($correctAnswers as $correctAnswerId) {
                         if (in_array($correctAnswerId, $userAnswers)) {
                             $correctAnswerCount++;
                         }
                     }
-                    
+
                     // Также проверяем, что пользователь не выбрал лишние неправильные ответы
                     $wrongAnswers = array_diff($userAnswers, $correctAnswers);
                     $hasWrongAnswers = count($wrongAnswers) > 0;
-                    
+
                     $questionPoints = $totalCorrectAnswers; // Максимум баллов = количество правильных ответов
                     $earnedQuestionPoints = $correctAnswerCount; // Заработанные баллы = количество правильных ответов
-                    
+
                     // Вопрос считается полностью правильным только если выбраны все правильные ответы и нет неправильных
-                    $isCorrect = $correctAnswerCount === $totalCorrectAnswers && !$hasWrongAnswers;
+                    $isCorrect = $correctAnswerCount === $totalCorrectAnswers && ! $hasWrongAnswers;
                     break;
 
                 case 'fill_in_the_blank':
@@ -236,7 +248,7 @@ class TestController extends Controller
                     $isCorrect = $fillInTheBlankResult['is_correct'];
                     $earnedQuestionPoints = $fillInTheBlankResult['earned_points'];
                     $questionPoints = $fillInTheBlankResult['max_points'];
-                    
+
                     // Сохраняем детальные результаты для множественных пропусков
                     if (isset($fillInTheBlankResult['blank_results'])) {
                         $results[] = [
@@ -245,31 +257,37 @@ class TestController extends Controller
                             'is_correct' => $isCorrect,
                             'max_points' => $questionPoints,
                             'earned_points' => $earnedQuestionPoints,
-                            'blank_results' => $fillInTheBlankResult['blank_results']
+                            'blank_results' => $fillInTheBlankResult['blank_results'],
                         ];
-                        
+
                         $totalPoints += $questionPoints;
                         $earnedPoints += $earnedQuestionPoints;
+
                         continue 2; // Переходим к следующему вопросу
                     }
                     break;
 
                 case 'matching':
                     // Для matching вопросов userAnswer должен быть массивом пар
-                    $correctPairs = $question->matchPairs->pluck('right_text', 'left_text')->toArray();
+                    // Собираем только полные пары (где есть и left_text и right_text)
+                    $correctPairs = $question->matchPairs
+                        ->whereNotNull('left_text')
+                        ->whereNotNull('right_text')
+                        ->pluck('right_text', 'left_text')
+                        ->toArray();
                     $userPairs = is_array($userAnswer) ? $userAnswer : [];
-                    
+
                     // Подсчитываем правильные пары (1 балл за каждую)
                     $correctPairCount = 0;
                     $totalPairs = count($correctPairs);
-                    
+
                     foreach ($correctPairs as $left => $right) {
                         if (isset($userPairs[$left]) && $userPairs[$left] === $right) {
                             $correctPairCount++;
                         }
                     }
-                    
-                    $questionPoints = $totalPairs; // Максимум баллов = количество пар
+
+                    $questionPoints = $totalPairs; // Максимум баллов = количество полных пар
                     $earnedQuestionPoints = $correctPairCount;
                     $isCorrect = $correctPairCount === $totalPairs; // Полностью правильно только если все пары верны
                     break;
@@ -283,7 +301,7 @@ class TestController extends Controller
                 'user_answer' => $userAnswer,
                 'is_correct' => $isCorrect,
                 'max_points' => $questionPoints,
-                'earned_points' => $earnedQuestionPoints
+                'earned_points' => $earnedQuestionPoints,
             ];
         }
 
@@ -301,25 +319,25 @@ class TestController extends Controller
         // Приводим к нижнему регистру и убираем лишние пробелы
         $userText = trim(strtolower($userAnswer));
         $correctText = trim(strtolower($correctAnswer));
-        
+
         // Точное совпадение
         if ($userText === $correctText) {
             return true;
         }
-        
+
         // Проверка для украинских слов с возможными окончаниями
         if ($this->checkUkrainianWordVariants($userText, $correctText)) {
             return true;
         }
-        
+
         // Проверка альтернативных написаний
         if ($this->checkAlternativeSpellings($userText, $correctText)) {
             return true;
         }
-        
+
         return false;
     }
-    
+
     /**
      * Проверка украинских слов с учетом возможных окончаний
      */
@@ -329,14 +347,14 @@ class TestController extends Controller
         $endings = [
             // Мужской род
             ['', 'а', 'у', 'ом', 'і', 'ів', 'ам', 'ами', 'ах'],
-            // Женский род  
+            // Женский род
             ['а', 'и', 'і', 'у', 'ю', 'ою', 'ах', 'ам', 'ами'],
             // Средний род
             ['о', 'е', 'а', 'у', 'ом', 'і'],
             // Прилагательные
             ['ий', 'ій', 'ого', 'ому', 'им', 'ому', 'і', 'их', 'им', 'ими'],
         ];
-        
+
         // Проверяем, является ли один текст основой другого с добавленным окончанием
         foreach ([$userText, $correctText] as $base) {
             foreach ([$correctText, $userText] as $variant) {
@@ -350,10 +368,10 @@ class TestController extends Controller
                 }
             }
         }
-        
+
         return false;
     }
-    
+
     /**
      * Проверка альтернативных написаний
      */
@@ -373,7 +391,7 @@ class TestController extends Controller
             '2' => ['два', 'дві', 'другий', 'другой'],
             '3' => ['три', 'третий', 'третій'],
         ];
-        
+
         // Проверяем прямые соответствия
         foreach ($alternatives as $main => $variants) {
             if (($userText === $main && in_array($correctText, $variants)) ||
@@ -382,9 +400,7 @@ class TestController extends Controller
                 return true;
             }
         }
-        
+
         return false;
     }
-
 }
-

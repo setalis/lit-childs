@@ -46,7 +46,7 @@
                     <tbody class="bg-white divide-y divide-gray-200">
                         @forelse ($subsections as $subsection)
                             <tr>
-                                <td class="px-2 py-4 whitespace-nowrap text-sm text-gray-900 text-center">{{ $subsection->order }}</td>
+                                <td class="px-2 py-4 whitespace-nowrap text-sm text-gray-900 text-center">{{ $subsection->section->order }}.{{ $subsection->order }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ Str::limit($subsection->title, 70) }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Розділ {{ $subsection->section->order }}. {{ Str::limit($subsection->section->title, 35) }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">

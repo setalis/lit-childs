@@ -195,16 +195,42 @@
                                     </div>
                                 @elseif($q['type'] === 'matching')
                                     <div class="mb-2">
+                                        <div class="bg-blue-50 border border-blue-200 rounded p-3 mb-3">
+                                            <h4 class="text-xs font-bold text-blue-800 mb-2">Інструкція для співставлення</h4>
+                                            <p class="text-xs text-blue-700 mb-2">
+                                                Створіть пари для співставлення. Для відволікаючих елементів залиште одне з полів порожнім.
+                                            </p>
+                                            <p class="text-xs text-blue-600">
+                                                Приклад: 3 повні пари + 1 елемент тільки ліворуч + 1 елемент тільки праворуч = 4 елементи ліворуч, 4 елементи праворуч, 3 бали
+                                            </p>
+                                        </div>
+                                        
                                         <div class="flex justify-between items-center mb-1">
                                             <span class="text-xs font-bold">Пари для відповідності</span>
                                             <button type="button" wire:click="addMatchPair({{ $qIndex }})" class="text-xs px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600">Додати пару</button>
                                         </div>
                                         @foreach($q['match_pairs'] as $pIndex => $pair)
-                                            <div class="flex items-center space-x-2 mb-1">
-                                                <input type="text" wire:model="questions.{{ $qIndex }}.match_pairs.{{ $pIndex }}.left_text" class="border rounded px-2 py-1" placeholder="Ліва частина">
-                                                <span class="text-xs">—</span>
-                                                <input type="text" wire:model="questions.{{ $qIndex }}.match_pairs.{{ $pIndex }}.right_text" class="border rounded px-2 py-1" placeholder="Права частина">
-                                                <button type="button" wire:click="removeMatchPair({{ $qIndex }}, {{ $pIndex }})" class="text-xs text-red-600 hover:text-red-900">Видалити</button>
+                                            <div class="flex items-center space-x-2 mb-2 p-2 bg-white rounded border border-gray-200">
+                                                <div class="flex-1">
+                                                    <input type="text" 
+                                                           wire:model="questions.{{ $qIndex }}.match_pairs.{{ $pIndex }}.left_text" 
+                                                           class="w-full border rounded px-2 py-1 text-sm" 
+                                                           placeholder="Ліва частина (або залиште порожнім)">
+                                                </div>
+                                                <span class="text-xs font-bold">↔</span>
+                                                <div class="flex-1">
+                                                    <input type="text" 
+                                                           wire:model="questions.{{ $qIndex }}.match_pairs.{{ $pIndex }}.right_text" 
+                                                           class="w-full border rounded px-2 py-1 text-sm" 
+                                                           placeholder="Права частина (або залиште порожнім)">
+                                                </div>
+                                                <button type="button" 
+                                                        wire:click="removeMatchPair({{ $qIndex }}, {{ $pIndex }})" 
+                                                        class="text-xs text-red-600 hover:text-red-900 px-2 py-1">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                                    </svg>
+                                                </button>
                                             </div>
                                         @endforeach
                                     </div>

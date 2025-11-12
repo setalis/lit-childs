@@ -170,7 +170,7 @@
                         <div class="matching-container" id="matching-{{ $question->id }}">
                             <div class="matching-left">
                                 <h4 class="font-semibold mb-3 text-center">Ліва частина</h4>
-                                @foreach($question->matchPairs as $pair)
+                                @foreach($question->matchPairs->whereNotNull('left_text') as $pair)
                                     <div class="matching-item left-item" 
                                          data-left="{{ $pair->left_text }}"
                                          onclick="selectMatchingItem(this, 'left', {{ $question->id }})">
