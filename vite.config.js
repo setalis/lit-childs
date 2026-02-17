@@ -15,14 +15,4 @@ export default defineConfig({
     server: {
         cors: true,
     },
-    build: {
-        rollupOptions: {
-            input: {
-                app: 'resources/js/app.js',
-            },
-        },
-    },
-    publicDir: 'public',
-    // Копируем TinyMCE в публичную папку
-    copyPublicDir: true,
 });

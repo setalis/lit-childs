@@ -14,9 +14,28 @@ class TestMatchPair extends Model
         'question_id',
         'left_text',
         'right_text',
+        'right_image_path',
         'is_distractor',
         'order',
     ];
+
+    /**
+     * Унікальний ідентифікатор правої частини (текст або шлях до зображення).
+     */
+    public function getRightValueAttribute(): ?string
+    {
+        return $this->right_image_path ?? $this->right_text;
+    }
+
+    /**
+     * Повний URL зображення правої частини.
+     */
+    public function getRightImageUrlAttribute(): ?string
+    {
+        return $this->right_image_path
+            ? asset('storage/'.$this->right_image_path)
+            : null;
+    }
 
     public function question(): BelongsTo
     {

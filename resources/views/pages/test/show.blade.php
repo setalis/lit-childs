@@ -62,6 +62,9 @@
         border-color: #3b82f6;
         background-color: #dbeafe;
     }
+    .matching-item.matching-used {
+        display: none;
+    }
 </style>
 @endpush
 
@@ -181,21 +184,41 @@
                             <div class="matching-right">
                                 <h4 class="font-semibold mb-3 text-center">Права частина</h4>
                                 @if(isset($question->shuffled_right_items))
-                                    {{-- Используем перемешанные элементы из контроллера --}}
-                                    @foreach($question->shuffled_right_items as $rightText)
-                                        <div class="matching-item right-item" 
-                                             data-right="{{ $rightText }}"
+                                    @foreach($question->shuffled_right_items as $item)
+                                        @php
+                                            $value = is_array($item) ? ($item['value'] ?? '') : $item;
+                                            $isImage = is_array($item) && ($item['is_image'] ?? false);
+                                            $imgSrc = $isImage ? asset('storage/' . $value) : null;
+                                        @endphp
+                                        <div class="matching-item right-item"
+                                             data-right="{{ e($value) }}"
+                                             data-is-image="{{ $isImage ? '1' : '0' }}"
+                                             data-right-url="{{ $imgSrc }}"
                                              onclick="selectMatchingItem(this, 'right', {{ $question->id }})">
-                                            {{ $rightText }}
+                                            @if($isImage)
+                                                <img src="{{ $imgSrc }}" alt="" class="max-h-[150px] max-w-[150px] w-auto object-contain">
+                                            @else
+                                                {{ $value }}
+                                            @endif
                                         </div>
                                     @endforeach
                                 @else
-                                    {{-- Fallback: используем исходный порядок --}}
-                                    @foreach($question->matchPairs as $pair)
-                                        <div class="matching-item right-item" 
-                                             data-right="{{ $pair->right_text }}"
+                                    @foreach($question->matchPairs->filter(fn ($p) => $p->right_value !== null) as $pair)
+                                        @php
+                                            $value = $pair->right_value;
+                                            $isImage = $pair->right_image_path !== null;
+                                            $imgSrc = $isImage ? asset('storage/' . $pair->right_image_path) : null;
+                                        @endphp
+                                        <div class="matching-item right-item"
+                                             data-right="{{ e($value) }}"
+                                             data-is-image="{{ $isImage ? '1' : '0' }}"
+                                             data-right-url="{{ $imgSrc }}"
                                              onclick="selectMatchingItem(this, 'right', {{ $question->id }})">
-                                            {{ $pair->right_text }}
+                                            @if($isImage)
+                                                <img src="{{ $imgSrc }}" alt="" class="max-h-[150px] max-w-[150px] w-auto object-contain">
+                                            @else
+                                                {{ $value }}
+                                            @endif
                                         </div>
                                     @endforeach
                                 @endif
@@ -253,6 +276,12 @@ function toggleMultipleChoice(element) {
 
 let matchingSelections = {};
 
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
 function selectMatchingItem(element, side, questionId) {
     const questionKey = `q${questionId}`;
     
@@ -285,19 +314,52 @@ function createMatchingPair(questionId) {
     const questionKey = `q${questionId}`;
     const selection = matchingSelections[questionKey];
     
+    const selectedRightEl = document.querySelector(`#matching-${questionId} .right-item.selected`);
+    const isImage = selectedRightEl && selectedRightEl.dataset.isImage === '1';
+    const rightUrl = selectedRightEl ? selectedRightEl.dataset.rightUrl : null;
+    
+    const leftDisplay = escapeHtml(selection.left);
+    const rightDisplay = isImage && rightUrl
+        ? `<img src="${rightUrl}" alt="" class="max-h-[150px] max-w-[150px] w-auto object-contain">`
+        : escapeHtml(selection.right);
+    
     const pairsDisplay = document.getElementById(`pairs-display-${questionId}`);
     const pairDiv = document.createElement('div');
-    pairDiv.className = 'flex justify-between items-center p-2 bg-white rounded border mb-2';
+    pairDiv.className = 'flex items-center gap-3 p-3 bg-white rounded border mb-3';
     pairDiv.innerHTML = `
-        <span>${selection.left} ↔ ${selection.right}</span>
-        <button type="button" onclick="removePair(this, ${questionId})" class="text-red-500 hover:text-red-700">✕</button>
-        <input type="hidden" name="answers[${questionId}][${selection.left}]" value="${selection.right}">
+        <div class="flex-1 min-w-0 p-3 bg-gray-50 rounded border border-gray-200 text-center">
+            <span class="text-sm text-gray-500 block mb-1">Ліва частина</span>
+            <span class="font-medium break-words">${leftDisplay}</span>
+        </div>
+        <div class="shrink-0 text-gray-400" aria-hidden="true">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+            </svg>
+        </div>
+        <div class="flex-1 min-w-0 p-3 bg-gray-50 rounded border border-gray-200 text-center">
+            <span class="text-sm text-gray-500 block mb-1">Права частина</span>
+            <div class="font-medium break-words">${rightDisplay}</div>
+        </div>
+        <button type="button" onclick="removePair(this, ${questionId})" class="shrink-0 p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded" title="Видалити пару">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+        <input type="hidden" name="answers[${questionId}][${escapeHtml(selection.left)}]" value="${escapeHtml(selection.right)}" data-left="${escapeHtml(selection.left)}" data-right="${escapeHtml(selection.right)}">
     `;
     
     pairsDisplay.appendChild(pairDiv);
     
-    // Сброс выбора
+    // Ховаємо використані елементи з вибору
     const container = document.getElementById(`matching-${questionId}`);
+    container.querySelectorAll('.left-item').forEach(el => {
+        if (el.dataset.left === selection.left) el.classList.add('matching-used');
+    });
+    container.querySelectorAll('.right-item').forEach(el => {
+        if (el.dataset.right === selection.right) el.classList.add('matching-used');
+    });
+    
+    // Сброс выбора
     container.querySelectorAll('.matching-item').forEach(item => {
         item.classList.remove('selected');
     });
@@ -306,7 +368,25 @@ function createMatchingPair(questionId) {
 }
 
 function removePair(button, questionId) {
-    button.closest('div').remove();
+    const pairDiv = button.closest('div');
+    const hiddenInput = pairDiv.querySelector('input[type="hidden"]');
+    const leftVal = hiddenInput?.dataset?.left;
+    const rightVal = hiddenInput?.dataset?.right;
+    
+    pairDiv.remove();
+    
+    // Повертаємо елементи у вибір
+    if (leftVal !== undefined && rightVal !== undefined) {
+        const container = document.getElementById(`matching-${questionId}`);
+        if (container) {
+            container.querySelectorAll('.left-item').forEach(el => {
+                if (el.dataset.left === leftVal) el.classList.remove('matching-used');
+            });
+            container.querySelectorAll('.right-item').forEach(el => {
+                if (el.dataset.right === rightVal) el.classList.remove('matching-used');
+            });
+        }
+    }
 }
 </script>
 @endpush

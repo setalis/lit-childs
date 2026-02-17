@@ -288,19 +288,21 @@
                                 <h5 class="font-medium text-gray-700 mb-3">Детальні результати по парах:</h5>
                                 @foreach($result['question']->matchPairs as $pair)
                                     @php
-                                        // Визначаємо, чи є це відволікаючий елемент
-                                        $isLeftDistractor = $pair->left_text !== null && $pair->right_text === null;
-                                        $isRightDistractor = $pair->left_text === null && $pair->right_text !== null;
+                                        $hasRightValue = $pair->right_value !== null;
+                                        $isLeftDistractor = $pair->left_text !== null && !$hasRightValue;
+                                        $isRightDistractor = $pair->left_text === null && $hasRightValue;
                                         $isDistractor = $isLeftDistractor || $isRightDistractor;
-                                        
-                                        // Для повних пар перевіряємо відповідь користувача
+
                                         $userAnswer = null;
                                         $isCorrectPair = false;
-                                        
+
                                         if (!$isDistractor && $pair->left_text !== null) {
                                             $userAnswer = is_array($result['user_answer']) ? ($result['user_answer'][$pair->left_text] ?? null) : null;
-                                            $isCorrectPair = $userAnswer === $pair->right_text;
+                                            $isCorrectPair = $userAnswer === $pair->right_value;
                                         }
+
+                                        $userAnswerIsImage = $userAnswer && (str_contains((string) $userAnswer, 'test_match_pairs') || str_contains((string) $userAnswer, '/'));
+                                        $rightValueIsImage = $pair->right_image_path !== null;
                                     @endphp
                                     <div class="flex items-center justify-between p-3 rounded-lg border 
                                         @if($isDistractor)
@@ -317,19 +319,31 @@
                                                 <span class="text-gray-600 italic">(відволікаючий елемент ліворуч)</span>
                                             @elseif($isRightDistractor)
                                                 <span class="text-gray-600 italic">(відволікаючий елемент праворуч:</span>
-                                                <span class="font-medium ml-1">{{ $pair->right_text }}</span>
+                                                @if($rightValueIsImage)
+                                                    <img src="{{ asset('storage/' . $pair->right_image_path) }}" alt="" class="inline max-h-12 w-auto object-contain align-middle ml-1">
+                                                @else
+                                                    <span class="font-medium ml-1">{{ $pair->right_text }}</span>
+                                                @endif
                                                 <span class="text-gray-600 italic">)</span>
                                             @else
                                                 <span class="font-medium">{{ $pair->left_text }}</span>
                                                 <span class="mx-2">↔</span>
-                                                <span class="
-                                                    {{ $isCorrectPair ? 'text-green-800' : 'text-red-800' }}
-                                                ">
-                                                    {{ $userAnswer ?? '(не обрано)' }}
+                                                <span class="{{ $isCorrectPair ? 'text-green-800' : 'text-red-800' }}">
+                                                    @if($userAnswerIsImage)
+                                                        <img src="{{ asset('storage/' . $userAnswer) }}" alt="" class="inline max-h-10 w-auto object-contain align-middle">
+                                                    @else
+                                                        {{ $userAnswer ?? '(не обрано)' }}
+                                                    @endif
                                                 </span>
-                                                @if(!$isCorrectPair && $userAnswer)
+                                                @if(!$isCorrectPair && $pair->right_value)
                                                     <span class="text-sm text-gray-600 ml-3">
-                                                        (правильно: <strong>{{ $pair->right_text }}</strong>)
+                                                        (правильно:
+                                                        @if($rightValueIsImage)
+                                                            <img src="{{ asset('storage/' . $pair->right_image_path) }}" alt="" class="inline max-h-10 w-auto object-contain align-middle">
+                                                        @else
+                                                            <strong>{{ $pair->right_text }}</strong>
+                                                        @endif
+                                                        )
                                                     </span>
                                                 @endif
                                             @endif

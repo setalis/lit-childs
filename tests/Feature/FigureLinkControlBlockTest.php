@@ -79,5 +79,3 @@ test('helper function respects control block context', function () {
     // (так как в нем нет слов, которые могли бы стать ссылками)
     expect($processedWithoutContext)->toBe($processedWithContext);
 });
-
-

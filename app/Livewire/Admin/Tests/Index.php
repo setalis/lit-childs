@@ -4,11 +4,18 @@ namespace App\Livewire\Admin\Tests;
 
 use App\Models\Test;
 use App\Models\TestQuestion;
+use Illuminate\Support\Str;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 
 class Index extends Component
 {
+    use WithFileUploads;
+
     public $showModal = false;
+
+    /** @var array<string, \Illuminate\Http\UploadedFile> Файли зображень для пар (ключ: temp_id пари) */
+    public $matchPairImages = [];
 
     public $editingId = null;
 
@@ -89,8 +96,11 @@ class Index extends Component
                 foreach ($q->matchPairs as $pair) {
                     $item['match_pairs'][] = [
                         'id' => $pair->id,
+                        'temp_id' => 'pair_'.$pair->id,
                         'left_text' => $pair->left_text,
                         'right_text' => $pair->right_text,
+                        'right_image_path' => $pair->right_image_path,
+                        'right_type' => $pair->right_image_path ? 'image' : 'text',
                         'is_distractor' => $pair->is_distractor ?? false,
                     ];
                 }
@@ -138,15 +148,34 @@ class Index extends Component
     {
         $this->questions[$qIndex]['match_pairs'][] = [
             'id' => null,
+            'temp_id' => 'pair_'.Str::random(8),
             'left_text' => '',
             'right_text' => '',
+            'right_image_path' => null,
+            'right_type' => 'text',
             'is_distractor' => false,
         ];
     }
 
     public function removeMatchPair($qIndex, $pIndex)
     {
+        $pair = $this->questions[$qIndex]['match_pairs'][$pIndex] ?? null;
+        if ($pair && isset($pair['temp_id'])) {
+            unset($this->matchPairImages[$pair['temp_id']]);
+        }
         array_splice($this->questions[$qIndex]['match_pairs'], $pIndex, 1);
+    }
+
+    public function removeMatchPairImage($qIndex, $pIndex): void
+    {
+        if (isset($this->questions[$qIndex]['match_pairs'][$pIndex])) {
+            $pair = &$this->questions[$qIndex]['match_pairs'][$pIndex];
+            if (isset($pair['temp_id'])) {
+                unset($this->matchPairImages[$pair['temp_id']]);
+            }
+            $pair['right_image_path'] = null;
+            $pair['right_type'] = 'text';
+        }
     }
 
     public function toggleCollapseQuestion($index)
@@ -312,14 +341,27 @@ class Index extends Component
                 }
             } elseif ($q['type'] === 'matching') {
                 foreach ($q['match_pairs'] as $pair) {
-                    // Пропускаємо порожні пари (обидва поля порожні)
                     $leftText = ! empty($pair['left_text']) ? $pair['left_text'] : null;
-                    $rightText = ! empty($pair['right_text']) ? $pair['right_text'] : null;
+                    $rightText = null;
+                    $rightImagePath = null;
 
-                    if ($leftText !== null || $rightText !== null) {
+                    if (($pair['right_type'] ?? 'text') === 'image') {
+                        $tempId = $pair['temp_id'] ?? null;
+                        $uploadedFile = $tempId ? ($this->matchPairImages[$tempId] ?? null) : null;
+                        if ($uploadedFile) {
+                            $rightImagePath = $uploadedFile->store('test_match_pairs', 'public');
+                        } elseif (! empty($pair['right_image_path'])) {
+                            $rightImagePath = $pair['right_image_path'];
+                        }
+                    } else {
+                        $rightText = ! empty($pair['right_text']) ? $pair['right_text'] : null;
+                    }
+
+                    if ($leftText !== null || $rightText !== null || $rightImagePath !== null) {
                         $question->matchPairs()->create([
                             'left_text' => $leftText,
                             'right_text' => $rightText,
+                            'right_image_path' => $rightImagePath,
                             'is_distractor' => $pair['is_distractor'] ?? false,
                         ]);
                     }
@@ -348,6 +390,7 @@ class Index extends Component
         $this->description = '';
         $this->order = 0;
         $this->questions = [];
+        $this->matchPairImages = [];
         $this->collapsedQuestions = [];
     }
 

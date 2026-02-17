@@ -212,21 +212,72 @@
                                         @foreach($q['match_pairs'] as $pIndex => $pair)
                                             <div class="flex items-center space-x-2 mb-2 p-2 bg-white rounded border border-gray-200">
                                                 <div class="flex-1">
-                                                    <input type="text" 
-                                                           wire:model="questions.{{ $qIndex }}.match_pairs.{{ $pIndex }}.left_text" 
-                                                           class="w-full border rounded px-2 py-1 text-sm" 
+                                                    <input type="text"
+                                                           wire:model="questions.{{ $qIndex }}.match_pairs.{{ $pIndex }}.left_text"
+                                                           class="w-full border rounded px-2 py-1 text-sm"
                                                            placeholder="Ліва частина (або залиште порожнім)">
                                                 </div>
                                                 <span class="text-xs font-bold">↔</span>
-                                                <div class="flex-1">
-                                                    <input type="text" 
-                                                           wire:model="questions.{{ $qIndex }}.match_pairs.{{ $pIndex }}.right_text" 
-                                                           class="w-full border rounded px-2 py-1 text-sm" 
-                                                           placeholder="Права частина (або залиште порожнім)">
+                                                <div class="flex-1 space-y-2">
+                                                    <div class="flex gap-2 mb-1">
+                                                        <label class="flex items-center text-xs">
+                                                            <input type="radio"
+                                                                   wire:model="questions.{{ $qIndex }}.match_pairs.{{ $pIndex }}.right_type"
+                                                                   value="text"
+                                                                   class="mr-1">
+                                                            Текст
+                                                        </label>
+                                                        <label class="flex items-center text-xs">
+                                                            <input type="radio"
+                                                                   wire:model="questions.{{ $qIndex }}.match_pairs.{{ $pIndex }}.right_type"
+                                                                   value="image"
+                                                                   class="mr-1">
+                                                            Зображення
+                                                        </label>
+                                                    </div>
+                                                    @if(($pair['right_type'] ?? 'text') === 'text')
+                                                        <input type="text"
+                                                               wire:model="questions.{{ $qIndex }}.match_pairs.{{ $pIndex }}.right_text"
+                                                               class="w-full border rounded px-2 py-1 text-sm"
+                                                               placeholder="Права частина (текст)">
+                                                    @else
+                                                        @php
+                                                            $tempId = $pair['temp_id'] ?? $qIndex.'_'.$pIndex;
+                                                            $uploadedFile = $matchPairImages[$tempId] ?? null;
+                                                            $imgSrc = null;
+                                                            if ($uploadedFile && is_object($uploadedFile) && method_exists($uploadedFile, 'temporaryUrl')) {
+                                                                $imgSrc = $uploadedFile->temporaryUrl();
+                                                            } elseif (!empty($pair['right_image_path'])) {
+                                                                $imgSrc = asset('storage/' . $pair['right_image_path']);
+                                                            }
+                                                        @endphp
+                                                        <div class="space-y-1">
+                                                            @if($imgSrc)
+                                                                <div class="flex items-center gap-2">
+                                                                    <img src="{{ $imgSrc }}"
+                                                                         alt=""
+                                                                         class="h-12 w-auto object-contain border rounded">
+                                                                    <button type="button"
+                                                                            wire:click="removeMatchPairImage({{ $qIndex }}, {{ $pIndex }})"
+                                                                            class="text-xs text-red-600 hover:text-red-900">
+                                                                        Видалити зображення
+                                                                    </button>
+                                                                </div>
+                                                            @endif
+                                                            <input type="file"
+                                                                   wire:model="matchPairImages.{{ $tempId }}"
+                                                                   accept="image/*"
+                                                                   class="w-full text-xs">
+                                                            <span wire:loading wire:target="matchPairImages.{{ $tempId }}" class="text-xs text-blue-600">Завантаження...</span>
+                                                            @error('matchPairImages.'.$tempId)
+                                                                <span class="text-xs text-red-600">{{ $message }}</span>
+                                                            @enderror
+                                                        </div>
+                                                    @endif
                                                 </div>
-                                                <button type="button" 
-                                                        wire:click="removeMatchPair({{ $qIndex }}, {{ $pIndex }})" 
-                                                        class="text-xs text-red-600 hover:text-red-900 px-2 py-1">
+                                                <button type="button"
+                                                        wire:click="removeMatchPair({{ $qIndex }}, {{ $pIndex }})"
+                                                        class="text-xs text-red-600 hover:text-red-900 px-2 py-1 shrink-0">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                                                     </svg>

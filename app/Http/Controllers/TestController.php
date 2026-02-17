@@ -54,15 +54,16 @@ class TestController extends Controller
         // Перемешиваем правую колонку для вопросов типа "matching"
         $test->questions->each(function ($question) {
             if ($question->type === 'matching' && $question->matchPairs->isNotEmpty()) {
-                // Собираем все правые элементы (включая отвлекающие)
-                // Правый элемент существует, если right_text не null
                 $rightItems = $question->matchPairs
-                    ->whereNotNull('right_text')
-                    ->pluck('right_text')
-                    ->shuffle();
+                    ->filter(fn ($pair) => $pair->right_value !== null)
+                    ->map(fn ($pair) => [
+                        'value' => $pair->right_value,
+                        'is_image' => $pair->right_image_path !== null,
+                    ])
+                    ->shuffle()
+                    ->values();
 
-                // Присваиваем перемешанную коллекцию обратно как свойство
-                $question->shuffled_right_items = $rightItems->values();
+                $question->shuffled_right_items = $rightItems;
             }
         });
 
@@ -269,11 +270,10 @@ class TestController extends Controller
 
                 case 'matching':
                     // Для matching вопросов userAnswer должен быть массивом пар
-                    // Собираем только полные пары (где есть и left_text и right_text)
                     $correctPairs = $question->matchPairs
                         ->whereNotNull('left_text')
-                        ->whereNotNull('right_text')
-                        ->pluck('right_text', 'left_text')
+                        ->filter(fn ($pair) => $pair->right_value !== null)
+                        ->pluck('right_value', 'left_text')
                         ->toArray();
                     $userPairs = is_array($userAnswer) ? $userAnswer : [];
 

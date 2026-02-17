@@ -3,6 +3,7 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Request;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -14,6 +15,15 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web([
             \App\Http\Middleware\VerifyCsrfToken::class,
         ]);
+
+        // Настройка доверенных прокси для работы за Apache/Nginx
+        $middleware->trustProxies(
+            at: '*', // Доверяем всем прокси (для Apache/Nginx)
+            headers: Request::HEADER_X_FORWARDED_FOR |
+                Request::HEADER_X_FORWARDED_HOST |
+                Request::HEADER_X_FORWARDED_PORT |
+                Request::HEADER_X_FORWARDED_PROTO
+        );
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
