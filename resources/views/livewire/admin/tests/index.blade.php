@@ -241,20 +241,11 @@
                                                                class="w-full border rounded px-2 py-1 text-sm"
                                                                placeholder="Права частина (текст)">
                                                     @else
-                                                        @php
-                                                            $tempId = $pair['temp_id'] ?? $qIndex.'_'.$pIndex;
-                                                            $uploadedFile = $matchPairImages[$tempId] ?? null;
-                                                            $imgSrc = null;
-                                                            if ($uploadedFile && is_object($uploadedFile) && method_exists($uploadedFile, 'temporaryUrl')) {
-                                                                $imgSrc = $uploadedFile->temporaryUrl();
-                                                            } elseif (!empty($pair['right_image_path'])) {
-                                                                $imgSrc = asset('storage/' . $pair['right_image_path']);
-                                                            }
-                                                        @endphp
-                                                        <div class="space-y-1">
-                                                            @if($imgSrc)
+                                                        <div class="space-y-1"
+                                                             x-data="{ uploading: false, error: '' }">
+                                                            @if(!empty($pair['right_image_path']))
                                                                 <div class="flex items-center gap-2">
-                                                                    <img src="{{ $imgSrc }}"
+                                                                    <img src="{{ asset('storage/' . $pair['right_image_path']) }}"
                                                                          alt=""
                                                                          class="h-12 w-auto object-contain border rounded">
                                                                     <button type="button"
@@ -265,13 +256,30 @@
                                                                 </div>
                                                             @endif
                                                             <input type="file"
-                                                                   wire:model="matchPairImages.{{ $tempId }}"
-                                                                   accept="image/*"
-                                                                   class="w-full text-xs">
-                                                            <span wire:loading wire:target="matchPairImages.{{ $tempId }}" class="text-xs text-blue-600">Завантаження...</span>
-                                                            @error('matchPairImages.'.$tempId)
-                                                                <span class="text-xs text-red-600">{{ $message }}</span>
-                                                            @enderror
+                                                                   accept="image/jpeg,image/png,image/gif,image/webp"
+                                                                   class="w-full text-xs"
+                                                                   @change="
+                                                                       const file = $event.target.files[0];
+                                                                       if (!file) return;
+                                                                       uploading = true;
+                                                                       error = '';
+                                                                       const fd = new FormData();
+                                                                       fd.append('image', file);
+                                                                       fd.append('_token', document.querySelector('meta[name=csrf-token]').getAttribute('content'));
+                                                                       fetch('{{ route('admin.match-pair.upload-image') }}', { method: 'POST', body: fd })
+                                                                           .then(r => r.json())
+                                                                           .then(data => {
+                                                                               if (data.path) {
+                                                                                   $wire.setMatchPairImagePath({{ $qIndex }}, {{ $pIndex }}, data.path);
+                                                                               } else {
+                                                                                   error = data.message ?? 'Помилка завантаження';
+                                                                               }
+                                                                           })
+                                                                           .catch(() => { error = 'Помилка мережі'; })
+                                                                           .finally(() => { uploading = false; });
+                                                                   ">
+                                                            <span x-show="uploading" class="text-xs text-blue-600">Завантаження...</span>
+                                                            <span x-show="error" x-text="error" class="text-xs text-red-600"></span>
                                                         </div>
                                                     @endif
                                                 </div>

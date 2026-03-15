@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\FigureController as AdminFigureController;
+use App\Http\Controllers\Admin\MatchPairImageController as AdminMatchPairImageController;
 use App\Http\Controllers\Admin\TermController as AdminTermController;
 use App\Http\Controllers\BlockDisplayController;
 use App\Http\Controllers\ControlBlockController;
@@ -9,9 +10,8 @@ use App\Http\Controllers\FigureController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\SectionController;
 use App\Http\Controllers\SubsectionController;
-use App\Http\Controllers\TestController;
-
 use App\Http\Controllers\TermController;
+use App\Http\Controllers\TestController;
 use App\Http\Controllers\TinyMCEImageController;
 use App\Livewire\Admin\Figures\Index as AdminFiguresIndex;
 use App\Livewire\Admin\Sections\Index as AdminSectionsIndex;
@@ -74,6 +74,7 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     Route::get('/subsections', AdminSubsectionsIndex::class)->name('subsections.index');
     Route::get('/subsections/{subsection}/content', AdminSubsectionsManageContent::class)->name('subsections.content');
     Route::get('/tests', \App\Livewire\Admin\Tests\Index::class)->name('tests.index');
+    Route::post('/match-pair/upload-image', [AdminMatchPairImageController::class, 'upload'])->name('match-pair.upload-image');
 
     // Маршруты для управления персоналиями
     Route::get('/figures', AdminFiguresIndex::class)->name('figures.index');

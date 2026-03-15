@@ -6,16 +6,10 @@ use App\Models\Test;
 use App\Models\TestQuestion;
 use Illuminate\Support\Str;
 use Livewire\Component;
-use Livewire\WithFileUploads;
 
 class Index extends Component
 {
-    use WithFileUploads;
-
     public $showModal = false;
-
-    /** @var array<string, \Illuminate\Http\UploadedFile> Файли зображень для пар (ключ: temp_id пари) */
-    public $matchPairImages = [];
 
     public $editingId = null;
 
@@ -159,22 +153,21 @@ class Index extends Component
 
     public function removeMatchPair($qIndex, $pIndex)
     {
-        $pair = $this->questions[$qIndex]['match_pairs'][$pIndex] ?? null;
-        if ($pair && isset($pair['temp_id'])) {
-            unset($this->matchPairImages[$pair['temp_id']]);
-        }
         array_splice($this->questions[$qIndex]['match_pairs'], $pIndex, 1);
     }
 
     public function removeMatchPairImage($qIndex, $pIndex): void
     {
         if (isset($this->questions[$qIndex]['match_pairs'][$pIndex])) {
-            $pair = &$this->questions[$qIndex]['match_pairs'][$pIndex];
-            if (isset($pair['temp_id'])) {
-                unset($this->matchPairImages[$pair['temp_id']]);
-            }
-            $pair['right_image_path'] = null;
-            $pair['right_type'] = 'text';
+            $this->questions[$qIndex]['match_pairs'][$pIndex]['right_image_path'] = null;
+            $this->questions[$qIndex]['match_pairs'][$pIndex]['right_type'] = 'text';
+        }
+    }
+
+    public function setMatchPairImagePath(int $qIndex, int $pIndex, string $path): void
+    {
+        if (isset($this->questions[$qIndex]['match_pairs'][$pIndex])) {
+            $this->questions[$qIndex]['match_pairs'][$pIndex]['right_image_path'] = $path;
         }
     }
 
@@ -346,13 +339,7 @@ class Index extends Component
                     $rightImagePath = null;
 
                     if (($pair['right_type'] ?? 'text') === 'image') {
-                        $tempId = $pair['temp_id'] ?? null;
-                        $uploadedFile = $tempId ? ($this->matchPairImages[$tempId] ?? null) : null;
-                        if ($uploadedFile) {
-                            $rightImagePath = $uploadedFile->store('test_match_pairs', 'public');
-                        } elseif (! empty($pair['right_image_path'])) {
-                            $rightImagePath = $pair['right_image_path'];
-                        }
+                        $rightImagePath = ! empty($pair['right_image_path']) ? $pair['right_image_path'] : null;
                     } else {
                         $rightText = ! empty($pair['right_text']) ? $pair['right_text'] : null;
                     }
@@ -390,7 +377,6 @@ class Index extends Component
         $this->description = '';
         $this->order = 0;
         $this->questions = [];
-        $this->matchPairImages = [];
         $this->collapsedQuestions = [];
     }
 
