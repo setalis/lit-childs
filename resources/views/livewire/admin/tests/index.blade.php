@@ -62,7 +62,8 @@
                             </div>
                         </div>
                         @foreach($questions as $qIndex => $q)
-                            <div class="border border-gray-300 rounded-md p-3 mb-4 bg-gray-50">
+                            <div wire:key="question-{{ $q['id'] ?? 'new-'.$qIndex }}"
+                                 class="border border-gray-300 rounded-md p-3 mb-4 bg-gray-50">
                                 <div class="flex justify-between items-center mb-2">
                                     <span class="font-semibold">Питання #{{ $qIndex+1 }}</span>
                                     <div class="flex gap-2 items-center">
@@ -210,7 +211,8 @@
                                             <button type="button" wire:click="addMatchPair({{ $qIndex }})" class="text-xs px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600">Додати пару</button>
                                         </div>
                                         @foreach($q['match_pairs'] as $pIndex => $pair)
-                                            <div class="flex items-center space-x-2 mb-2 p-2 bg-white rounded border border-gray-200">
+                                            <div wire:key="match-pair-{{ $qIndex }}-{{ $pair['temp_id'] ?? $pIndex }}"
+                                                 class="flex items-center space-x-2 mb-2 p-2 bg-white rounded border border-gray-200">
                                                 <div class="flex-1">
                                                     <input type="text"
                                                            wire:model="questions.{{ $qIndex }}.match_pairs.{{ $pIndex }}.left_text"
