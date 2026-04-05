@@ -11,6 +11,8 @@ class Index extends Component
 {
     public $showModal = false;
 
+    public string $successMessage = '';
+
     public $editingId = null;
 
     public $title = '';
@@ -83,9 +85,11 @@ class Index extends Component
                         'is_correct' => $a->is_correct,
                         'blank_position' => $a->blank_position,
                     ];
-                    $detectedBlanks[] = $a->blank_position;
+                    if (! in_array($a->blank_position, $detectedBlanks)) {
+                        $detectedBlanks[] = $a->blank_position;
+                    }
                 }
-                $item['detected_blanks'] = $detectedBlanks;
+                $item['detected_blanks'] = array_values($detectedBlanks);
             } elseif ($q->type === 'matching') {
                 foreach ($q->matchPairs as $pair) {
                     $item['match_pairs'][] = [
@@ -310,25 +314,13 @@ class Index extends Component
                     ]);
                 }
             } elseif ($q['type'] === 'fill_in_the_blank') {
-                // Обрабатываем множественные пропуски
-                if (isset($q['detected_blanks']) && ! empty($q['detected_blanks'])) {
-                    foreach ($q['detected_blanks'] as $blankIndex => $blankNumber) {
-                        if (! empty($q['answers'][$blankIndex]['text'])) {
-                            $question->answers()->create([
-                                'text' => $q['answers'][$blankIndex]['text'],
-                                'is_correct' => true,
-                                'blank_position' => $blankNumber,
-                                'order' => $blankIndex,
-                            ]);
-                        }
-                    }
-                } else {
-                    // Fallback для старого формата (один пропуск)
-                    if (! empty($q['answers'][0]['text'])) {
+                foreach ($q['answers'] as $aIndex => $a) {
+                    if (! empty($a['text'])) {
                         $question->answers()->create([
-                            'text' => $q['answers'][0]['text'],
+                            'text' => $a['text'],
                             'is_correct' => true,
-                            'blank_position' => 1,
+                            'blank_position' => $a['blank_position'] ?? 1,
+                            'order' => $aIndex,
                         ]);
                     }
                 }
@@ -358,7 +350,7 @@ class Index extends Component
         $this->dispatch('cleanup-test-tinymce');
         $this->showModal = false;
         $this->resetForm();
-        session()->flash('message', 'Тест успешно сохранён.');
+        $this->successMessage = 'Тест успішно збережено.';
     }
 
     public function delete($id)

@@ -1,10 +1,15 @@
 <div class="container mx-auto px-4 py-8">
     <h1 class="text-2xl font-semibold mb-6">Тести</h1>
-    @if (session()->has('message'))
-        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
-            <span class="block sm:inline">{{ session('message') }}</span>
-        </div>
-    @endif
+    <div
+        x-data="{ show: false }"
+        x-init="$watch('$wire.successMessage', value => { if (value) { show = true; setTimeout(() => { show = false; $wire.successMessage = ''; }, 3000); } })"
+        x-show="show"
+        x-transition
+        class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4"
+        role="alert"
+    >
+        <span class="block sm:inline" x-text="$wire.successMessage"></span>
+    </div>
     <div class="mb-4 flex justify-end">
         <button wire:click="openCreateModal" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">Додати тест</button>
     </div>
