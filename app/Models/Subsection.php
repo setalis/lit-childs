@@ -5,8 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Subsection extends Model
 {
@@ -14,6 +14,7 @@ class Subsection extends Model
 
     protected $fillable = [
         'section_id',
+        'parent_id',
         'title',
         'order',
     ];
@@ -21,6 +22,16 @@ class Subsection extends Model
     public function section(): BelongsTo
     {
         return $this->belongsTo(Section::class);
+    }
+
+    public function parent(): BelongsTo
+    {
+        return $this->belongsTo(Subsection::class, 'parent_id');
+    }
+
+    public function subSubsections(): HasMany
+    {
+        return $this->hasMany(Subsection::class, 'parent_id')->orderBy('order');
     }
 
     public function theoryBlock(): HasOne

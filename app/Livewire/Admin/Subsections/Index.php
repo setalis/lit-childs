@@ -6,48 +6,58 @@ use App\Models\Section;
 use App\Models\Subsection;
 use Livewire\Component;
 use Livewire\WithPagination;
-use Illuminate\Validation\Rule;
 
 class Index extends Component
 {
     use WithPagination;
 
     public $search = '';
-    public $sortField = 'order';
-    public $sortDirection = 'asc';
-    public $filterBySection = ''; // Для фильтрации по разделу
 
-    // Для модального окна подтверждения удаления
+    public $sortField = 'order';
+
+    public $sortDirection = 'asc';
+
+    public $filterBySection = '';
+
     public $showDeleteModal = false;
+
     public $deletingSubsectionId = null;
+
     public $deletingSubsectionTitle = '';
 
-    // Для модального окна формы создания/редактирования
     public $showFormModal = false;
-    public $editingSubsectionId = null;
-    public $subsectionTitle = '';
-    public $subsectionOrder = 0;
-    public $selectedSectionId = null; // ID выбранного родительского раздела
 
-    public $sections = []; // Для списка разделов в форме
+    public $editingSubsectionId = null;
+
+    public $subsectionTitle = '';
+
+    public $subsectionOrder = 0;
+
+    public $selectedSectionId = null;
+
+    public $parentSubsectionId = null;
+
+    public $sections = [];
 
     protected $queryString = ['search', 'sortField', 'sortDirection', 'filterBySection'];
 
-    protected function rules()
+    protected function rules(): array
     {
         return [
             'subsectionTitle' => ['required', 'string', 'max:255'],
             'subsectionOrder' => ['required', 'integer', 'min:0'],
-            'selectedSectionId' => ['required', 'exists:sections,id'],
+            'selectedSectionId' => $this->parentSubsectionId
+                ? ['nullable']
+                : ['required', 'exists:sections,id'],
+            'parentSubsectionId' => ['nullable', 'exists:subsections,id'],
         ];
     }
 
-    public function mount()
+    public function mount(): void
     {
         $this->sections = Section::orderBy('title')->get();
-        // Установка значения по умолчанию для selectedSectionId, если есть разделы
+
         if ($this->sections->isNotEmpty() && is_null($this->selectedSectionId)) {
-             // Если фильтр по разделу активен, используем его, иначе первый раздел из списка
             if ($this->filterBySection && $this->sections->contains('id', $this->filterBySection)) {
                 $this->selectedSectionId = $this->filterBySection;
             } elseif ($this->sections->first()) {
@@ -56,8 +66,7 @@ class Index extends Component
         }
     }
 
-
-    public function sortBy($field)
+    public function sortBy(string $field): void
     {
         if ($this->sortField === $field) {
             $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
@@ -67,63 +76,78 @@ class Index extends Component
         $this->sortField = $field;
     }
 
-    // --- Методы для модального окна формы ---
-    public function openCreateModal()
+    public function openCreateModal(): void
     {
         $this->resetForm();
-        // Если активен фильтр по разделу, предзаполняем его
         if ($this->filterBySection) {
             $this->selectedSectionId = $this->filterBySection;
         } elseif ($this->sections->isNotEmpty()) {
-            $this->selectedSectionId = $this->sections->first()->id; // Предзаполняем первым разделом, если фильтр не активен
+            $this->selectedSectionId = $this->sections->first()->id;
         }
         $this->showFormModal = true;
     }
 
-    public function openEditModal($subsectionId)
+    public function openCreateSubSubsectionModal(int $parentId): void
+    {
+        $this->resetForm();
+        $this->parentSubsectionId = $parentId;
+        $this->showFormModal = true;
+    }
+
+    public function openEditModal(int $subsectionId): void
     {
         $subsection = Subsection::findOrFail($subsectionId);
         $this->editingSubsectionId = $subsection->id;
         $this->subsectionTitle = $subsection->title;
         $this->subsectionOrder = $subsection->order;
-        $this->selectedSectionId = $subsection->section_id;
+        $this->parentSubsectionId = $subsection->parent_id;
+        $this->selectedSectionId = $subsection->parent_id ? null : $subsection->section_id;
         $this->showFormModal = true;
     }
 
-    public function closeFormModal()
+    public function closeFormModal(): void
     {
         $this->showFormModal = false;
         $this->resetForm();
     }
 
-    public function saveSubsection()
+    public function saveSubsection(): void
     {
         $this->validate();
+
+        if ($this->parentSubsectionId) {
+            $parent = Subsection::findOrFail($this->parentSubsectionId);
+            $sectionId = $parent->section_id;
+        } else {
+            $sectionId = $this->selectedSectionId;
+        }
 
         $data = [
             'title' => $this->subsectionTitle,
             'order' => $this->subsectionOrder,
-            'section_id' => $this->selectedSectionId,
+            'section_id' => $sectionId,
+            'parent_id' => $this->parentSubsectionId ?: null,
         ];
 
         if ($this->editingSubsectionId) {
             $subsection = Subsection::find($this->editingSubsectionId);
             $subsection->update($data);
-            session()->flash('message', 'Підрозділ "' . $this->subsectionTitle . '" успішно оновлено.');
+            session()->flash('message', 'Підрозділ "'.$this->subsectionTitle.'" успішно оновлено.');
         } else {
             Subsection::create($data);
-            session()->flash('message', 'Підрозділ "' . $this->subsectionTitle . '" успішно створено.');
+            session()->flash('message', 'Підрозділ "'.$this->subsectionTitle.'" успішно створено.');
         }
         $this->closeFormModal();
     }
 
-    private function resetForm()
+    private function resetForm(): void
     {
         $this->editingSubsectionId = null;
         $this->subsectionTitle = '';
         $this->subsectionOrder = 0;
-        // Не сбрасываем selectedSectionId, если активен фильтр, чтобы он оставался
-        if (!$this->filterBySection && $this->sections->isNotEmpty()) {
+        $this->parentSubsectionId = null;
+
+        if (! $this->filterBySection && $this->sections->isNotEmpty()) {
             $this->selectedSectionId = $this->sections->first()->id;
         } elseif ($this->filterBySection) {
             $this->selectedSectionId = $this->filterBySection;
@@ -132,11 +156,8 @@ class Index extends Component
         }
         $this->resetErrorBag();
     }
-    // --- Конец методов для модального окна формы ---
 
-
-    // --- Методы для модального окна удаления ---
-    public function openDeleteModal($subsectionId)
+    public function openDeleteModal(int $subsectionId): void
     {
         $subsection = Subsection::findOrFail($subsectionId);
         $this->deletingSubsectionId = $subsection->id;
@@ -144,51 +165,62 @@ class Index extends Component
         $this->showDeleteModal = true;
     }
 
-    public function closeDeleteModal()
+    public function closeDeleteModal(): void
     {
         $this->showDeleteModal = false;
         $this->deletingSubsectionId = null;
         $this->deletingSubsectionTitle = '';
     }
 
-    public function deleteSubsection()
+    public function deleteSubsection(): void
     {
         if ($this->deletingSubsectionId) {
             $subsection = Subsection::find($this->deletingSubsectionId);
             if ($subsection) {
                 $subsection->delete();
-                session()->flash('message', 'Підрозділ "' . $this->deletingSubsectionTitle . '" успішно видалено.');
+                session()->flash('message', 'Підрозділ "'.$this->deletingSubsectionTitle.'" успішно видалено.');
             }
             $this->closeDeleteModal();
         }
     }
-    // --- Конец методов для модального окна удаления ---
 
-    public function updatedFilterBySection()
+    public function updatedFilterBySection(): void
     {
-        $this->resetPage(); // Сбрасываем пагинацию при изменении фильтра
-        // При смене фильтра, если открыта форма создания, обновляем selectedSectionId
-        if ($this->showFormModal && !$this->editingSubsectionId) {
+        $this->resetPage();
+        if ($this->showFormModal && ! $this->editingSubsectionId) {
             $this->selectedSectionId = $this->filterBySection ?: ($this->sections->isNotEmpty() ? $this->sections->first()->id : null);
         }
     }
-    
+
     public function render()
     {
         $subsections = Subsection::query()
-            ->with('section') // Загружаем связанный раздел
+            ->with(['section', 'subSubsections.section'])
+            ->whereNull('parent_id')
             ->when($this->search, function ($query) {
-                $query->where('title', 'like', '%' . $this->search . '%');
+                $query->where('title', 'like', '%'.$this->search.'%')
+                    ->orWhereHas('subSubsections', function ($q) {
+                        $q->where('title', 'like', '%'.$this->search.'%');
+                    });
             })
             ->when($this->filterBySection, function ($query) {
                 $query->where('section_id', $this->filterBySection);
             })
+            ->orderBy('section_id')
             ->orderBy($this->sortField, $this->sortDirection)
             ->paginate(10);
 
+        $parentSubsections = Subsection::query()
+            ->whereNull('parent_id')
+            ->with('section')
+            ->orderBy('section_id')
+            ->orderBy('order')
+            ->get();
+
         return view('livewire.admin.subsections.index', [
             'subsections' => $subsections,
-            'allSections' => $this->sections, // Передаем все разделы для фильтра и формы
+            'allSections' => $this->sections,
+            'parentSubsections' => $parentSubsections,
         ])->layout('components.layouts.app');
     }
 }

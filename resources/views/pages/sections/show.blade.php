@@ -53,6 +53,23 @@
                             </h2>
                         </div>
 
+                        {{-- Якщо є під-підрозділи — показуємо їх список замість блоків --}}
+                        @if($subsection->subSubsections->isNotEmpty())
+                            <div class="space-y-2 flex-grow mb-4">
+                                <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Під-підрозділи</p>
+                                @foreach($subsection->subSubsections as $subSub)
+                                    <a href="{{ route('subsections.show', $subSub) }}"
+                                       class="flex items-center text-sm text-gray-700 hover:text-[#28569A] transition-colors py-1">
+                                        <svg class="w-4 h-4 text-yellow-400 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                                        </svg>
+                                        <span class="font-medium text-[#28569A] mr-1">{{ $section->order }}.{{ $subsection->order }}.{{ $subSub->order }}</span>
+                                        {{ Str::limit($subSub->title, 45) }}
+                                    </a>
+                                @endforeach
+                            </div>
+                        @endif
+
                         {{-- Прогресс по подразделу --}}
                         <div class="space-y-3 flex-grow">
                             {{-- Теоретический блок --}}

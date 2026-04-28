@@ -18,6 +18,6 @@ class Section extends Model
 
     public function subsections(): HasMany
     {
-        return $this->hasMany(Subsection::class)->orderBy('order');
+        return $this->hasMany(Subsection::class)->whereNull('parent_id')->orderBy('order');
     }
 }

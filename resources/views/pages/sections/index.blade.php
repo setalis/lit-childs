@@ -266,7 +266,7 @@
 </div>
 
 
-    @if($sections->isEmpty())
+                        @if($sections->isEmpty())
         <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-6 rounded-lg" role="alert">
             <p class="font-bold text-lg">Розділи не знайдено</p>
             <p>На жаль, на даний момент у підручнику немає доступних розділів. Будь ласка, спробуйте зайти пізніше.</p>
@@ -288,7 +288,7 @@
                             </button>
                         </h2>
                     </div>
-                    
+
                     <div class="section-content" id="content-{{ $section->id }}">
                         @if($section->subsections->isEmpty())
                             <div class="no-content">
@@ -300,56 +300,78 @@
                                     <a href="{{ route('subsections.show', $subsection) }}" class="subsection-title">
                                         {{ $section->order }}.{{ $subsection->order }} {{ $subsection->title }}
                                     </a>
-                                    
-                                    <div class="content-blocks">
-                                        {{-- Теоретический материал --}}
-                                        @if($subsection->theoryBlock)
-                                            <a href="{{ route('blocks.theory.show', $subsection) }}" class="content-block">
-                                                <div class="block-title">
-                                                    📚 Теоретичний матеріал
+
+                                    @if($subsection->subSubsections->isNotEmpty())
+                                        {{-- Підрозділ має під-підрозділи — показуємо їх список --}}
+                                        <div class="mt-3 space-y-1">
+                                            @foreach($subsection->subSubsections as $subSub)
+                                                <div style="border-left: 3px solid #FFBB00; padding-left: 12px; margin-left: 4px;">
+                                                    <a href="{{ route('subsections.show', $subSub) }}"
+                                                       style="font-size: 0.9rem; color: #1e293b; text-decoration: none; display: block; padding: 4px 0;"
+                                                       onmouseover="this.style.color='#3A6EA5'" onmouseout="this.style.color='#1e293b'">
+                                                        <span style="color: #3A6EA5; font-weight: 600; margin-right: 6px;">
+                                                            {{ $section->order }}.{{ $subsection->order }}.{{ $subSub->order }}
+                                                        </span>
+                                                        {{ $subSub->title }}
+                                                    </a>
+                                                    <div class="content-blocks" style="margin-top: 6px;">
+                                                        @if($subSub->theoryBlock)
+                                                            <a href="{{ route('blocks.theory.show', $subSub) }}" class="content-block">
+                                                                <div class="block-title">📚 Теоретичний матеріал</div>
+                                                                <div class="block-description">Основні поняття та теорія по темі</div>
+                                                            </a>
+                                                        @endif
+                                                        @if($subSub->practiceBlocks->isNotEmpty())
+                                                            <a href="{{ route('blocks.practice.all', $subSub) }}" class="content-block">
+                                                                <div class="block-title">🛠️ Практичний матеріал</div>
+                                                                <div class="block-description">Практичні завдання та вправи</div>
+                                                            </a>
+                                                        @endif
+                                                        @if($subSub->homeworkBlock)
+                                                            <a href="{{ route('blocks.homework.show', $subSub) }}" class="content-block">
+                                                                <div class="block-title">📝 Самостійна робота</div>
+                                                                <div class="block-description">Домашні завдання та самостійна робота</div>
+                                                            </a>
+                                                        @endif
+                                                        @if($subSub->controlBlocks->isNotEmpty())
+                                                            <a href="{{ route('blocks.control.all', $subSub) }}" class="content-block">
+                                                                <div class="block-title">✅ Засоби контролю</div>
+                                                                <div class="block-description">Тести та контрольні завдання</div>
+                                                            </a>
+                                                        @endif
+                                                    </div>
                                                 </div>
-                                                <div class="block-description">
-                                                    Основні поняття та теорія по темі
-                                                </div>
-                                            </a>
-                                        @endif
-                                        
-                                        {{-- Практический материал --}}
-                                        @if($subsection->practiceBlocks->isNotEmpty())
-                                            <a href="{{ route('blocks.practice.all', $subsection) }}" class="content-block">
-                                                <div class="block-title">
-                                                    🛠️ Практичний матеріал
-                                                </div>
-                                                <div class="block-description">
-                                                    Практичні завдання та вправи
-                                                </div>
-                                            </a>
-                                        @endif
-                                        
-                                        {{-- Задания для самостоятельной работы --}}
-                                        @if($subsection->homeworkBlock)
-                                            <a href="{{ route('blocks.homework.show', $subsection) }}" class="content-block">
-                                                <div class="block-title">
-                                                    📝 Завдання для самостійної роботи
-                                                </div>
-                                                <div class="block-description">
-                                                    Домашні завдання та самостійна робота
-                                                </div>
-                                            </a>
-                                        @endif
-                                        
-                                        {{-- Средства контроля --}}
-                                        @if($subsection->controlBlocks->isNotEmpty())
-                                            <a href="{{ route('subsections.show', $subsection) }}/control" class="content-block">
-                                                <div class="block-title">
-                                                    ✅ Засоби контролю
-                                                </div>
-                                                <div class="block-description">
-                                                    Тести та контрольні завдання
-                                                </div>
-                                            </a>
-                                        @endif
-                                    </div>
+                                            @endforeach
+                                        </div>
+                                    @else
+                                        {{-- Звичайний підрозділ без під-підрозділів --}}
+                                        <div class="content-blocks">
+                                            @if($subsection->theoryBlock)
+                                                <a href="{{ route('blocks.theory.show', $subsection) }}" class="content-block">
+                                                    <div class="block-title">📚 Теоретичний матеріал</div>
+                                                    <div class="block-description">Основні поняття та теорія по темі</div>
+                                                </a>
+                                            @endif
+                                            @if($subsection->practiceBlocks->isNotEmpty())
+                                                <a href="{{ route('blocks.practice.all', $subsection) }}" class="content-block">
+                                                    <div class="block-title">🛠️ Практичний матеріал</div>
+                                                    <div class="block-description">Практичні завдання та вправи</div>
+                                                </a>
+                                            @endif
+                                            @if($subsection->homeworkBlock)
+                                                <a href="{{ route('blocks.homework.show', $subsection) }}" class="content-block">
+                                                    <div class="block-title">📝 Завдання для самостійної роботи</div>
+                                                    <div class="block-description">Домашні завдання та самостійна робота</div>
+                                                </a>
+                                            @endif
+                                            @if($subsection->controlBlocks->isNotEmpty())
+                                                <a href="{{ route('blocks.control.all', $subsection) }}" class="content-block">
+                                                    <div class="block-title">✅ Засоби контролю</div>
+                                                    <div class="block-description">Тести та контрольні завдання</div>
+                                                </a>
+                                            @endif
+                                        </div>
+                                    @endif
                                 </div>
                             @endforeach
                         @endif
