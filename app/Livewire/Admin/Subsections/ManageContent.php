@@ -2,41 +2,63 @@
 
 namespace App\Livewire\Admin\Subsections;
 
+use App\Models\BlockElement;
+use App\Models\Subsection;
 use Livewire\Component;
 use Livewire\WithFileUploads;
-use App\Models\Subsection;
-use App\Models\BlockElement;
 
 class ManageContent extends Component
 {
     use WithFileUploads;
-    
+
     public $subsection;
+
     public $showBlockElementModal = false;
+
     public $showPracticeBlockModal = false;
+
     public $editingBlockElementId = null;
+
     public $elementType = null;
+
     public $elementOrder = null;
+
     public $elementContentText = '';
+
     public $elementContentKeywords = '';
+
     public $elementContentList = '';
+
     public $elementContentImage = null;
+
     public $existingElementImage = null;
+
     public $editingPracticeBlockId = null;
+
     public $practiceBlockLevel = null;
+
     public $practiceBlockOrder = null;
+
     public $showDeleteBlockElementModal = false;
+
     public $showDeletePracticeBlockModal = false;
+
     public $showPracticeBlockDeleteModal = false;
+
     public $showDeleteModal = false;
+
     public $currentBlockType = null;
+
     public $currentBlockId = null;
 
     public $selectedTestIds = [];
+
     public $allTests = [];
 
     public $activeKnowledgeBlockId = null;
+
     public $activeKnowledgeAction = null;
+
     public $showCreateControlBlockModal = false;
 
     public function mount($subsection)
@@ -46,10 +68,10 @@ class ManageContent extends Component
             'theoryBlock.elements',
             'practiceBlocks.elements',
             'homeworkBlock.elements',
-            'controlBlocks.elements'
+            'controlBlocks.elements',
         ])->findOrFail($subsection);
         $this->allTests = \App\Models\Test::orderBy('title')->get();
-        
+
         // Заполняем выбранные тесты для каждого блока контроля знаний
         foreach ($this->subsection->controlBlocks as $block) {
             $this->selectedTestIds[$block->id] = $block->test_id;
@@ -76,7 +98,8 @@ class ManageContent extends Component
         if ($element->element_type === 'text') {
             $this->elementContentText = $element->content;
         } elseif ($element->element_type === 'keywords') {
-            $this->elementContentKeywords = $element->content;
+            $decoded = json_decode($element->content, true);
+            $this->elementContentKeywords = is_array($decoded) ? implode(', ', $decoded) : $element->content;
         } elseif ($element->element_type === 'list') {
             $this->elementContentList = is_array(json_decode($element->content, true)) ? implode("\n", json_decode($element->content, true)) : $element->content;
         } elseif ($element->element_type === 'image') {
@@ -110,7 +133,7 @@ class ManageContent extends Component
         } elseif ($this->elementType === 'list') {
             $rules['elementContentList'] = 'required|string';
         } elseif ($this->elementType === 'image') {
-            if ($this->editingBlockElementId && !$this->elementContentImage) {
+            if ($this->editingBlockElementId && ! $this->elementContentImage) {
                 // При редактировании изображение не обязательно, если уже есть
             } else {
                 $rules['elementContentImage'] = 'required|image|max:2048';
@@ -126,7 +149,7 @@ class ManageContent extends Component
             logger('Сохранение текстового элемента:', [
                 'content_length' => strlen($content),
                 'content_preview' => substr($content, 0, 100),
-                'element_id' => $this->editingBlockElementId
+                'element_id' => $this->editingBlockElementId,
             ]);
         } elseif ($this->elementType === 'keywords') {
             // Сохраняем ключевые слова как JSON-массив
@@ -155,8 +178,9 @@ class ManageContent extends Component
         } elseif ($this->currentBlockType === 'control') {
             $blockModel = $this->subsection->controlBlocks->find($this->currentBlockId);
         }
-        if (!$blockModel) {
+        if (! $blockModel) {
             session()->flash('error', 'Блок не найден.');
+
             return;
         }
 
@@ -275,7 +299,7 @@ class ManageContent extends Component
     // --- Теоретический блок ---
     public function createTheoryBlock()
     {
-        if (!$this->subsection->theoryBlock) {
+        if (! $this->subsection->theoryBlock) {
             $this->subsection->theoryBlock()->create();
             session()->flash('message', 'Теоретичний блок створено.');
         } else {
@@ -286,7 +310,7 @@ class ManageContent extends Component
     // --- Блок домашних заданий ---
     public function createHomeworkBlock()
     {
-        if (!$this->subsection->homeworkBlock) {
+        if (! $this->subsection->homeworkBlock) {
             $this->subsection->homeworkBlock()->create();
             session()->flash('message', 'Блок завдань для самостійної роботи створено.');
         } else {
@@ -334,12 +358,13 @@ class ManageContent extends Component
         if ($blockId) {
             $this->activeKnowledgeBlockId = $blockId;
         }
-        
+
         if ($this->activeKnowledgeBlockId === null) {
             session()->flash('error', 'Не выбран блок для действия!');
+
             return;
         }
-        
+
         $this->activeKnowledgeAction = $type;
     }
 
@@ -398,7 +423,7 @@ class ManageContent extends Component
             'constructive' => 'Конструктивний',
             'creative' => 'Творчий',
         ];
-        
+
         // Типы элементов блока
         $availableElementTypes = [
             'text' => 'Текст',
