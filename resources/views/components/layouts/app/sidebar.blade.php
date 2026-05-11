@@ -30,7 +30,7 @@
                 </flux:navlist.item>
 
                 <flux:navlist.item icon="book-open-text" href="#">
-                {{ __('Documentation') }}
+                {{ __('Документація') }}
                 </flux:navlist.item>
             </flux:navlist>
 
