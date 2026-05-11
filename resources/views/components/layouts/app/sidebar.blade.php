@@ -26,7 +26,7 @@
 
             <flux:navlist variant="outline">
                 <flux:navlist.item icon="folder-git-2" :href="route('home')" target="_blank">
-                {{ __('Repository') }}
+                {{ __('Домашня сторінка') }}
                 </flux:navlist.item>
 
                 <flux:navlist.item icon="book-open-text" href="#">
