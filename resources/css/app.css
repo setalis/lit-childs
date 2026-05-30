@@ -224,3 +224,8 @@ body, p, div, span, a, li, td, th, input, textarea, select, button {
     transform: scale(1.1);
     transition: transform 0.2s ease;
 }
+
+.text-base ol, text-base ul {
+    list-style: auto;
+    padding: 20px 20px 20px 40px;
+}
