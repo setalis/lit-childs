@@ -79,7 +79,7 @@
 
                     {{-- Основная биография --}}
                     <div class="prose  max-w-none text-gray-700 leading-relaxed mb-8">
-                        {!! process_figure_links($figure->biography) !!}
+                        {!! process_figure_links($figure->biography, true) !!}
                     </div>
 
                     {{-- Основные источники --}}
@@ -97,7 +97,7 @@
                                 </div>
                             </div>
                             <div class="prose max-w-none text-gray-700 leading-relaxed">
-                                {!! process_figure_links($figure->sources) !!}
+                                {!! process_figure_links($figure->sources, true) !!}
                             </div>
                         </div>
                     @endif
@@ -105,7 +105,7 @@
                     {{-- Дополнительная биография --}}
                     @if($figure->biography_2)
                         <div class="prose max-w-none text-gray-700 leading-relaxed mb-8">
-                            {!! process_figure_links($figure->biography_2) !!}
+                            {!! process_figure_links($figure->biography_2, true) !!}
                         </div>
                     @endif
 
@@ -124,7 +124,7 @@
                                 </div>
                             </div>
                             <div class="prose max-w-none text-gray-700 leading-relaxed">
-                                {!! process_figure_links($figure->sources_2) !!}
+                                {!! process_figure_links($figure->sources_2, true) !!}
                             </div>
                         </div>
                     @endif
@@ -135,7 +135,7 @@
                             @if($block->type === 'biography')
                                 {{-- Блок биографии --}}
                                 <div class="prose max-w-none text-gray-700 leading-relaxed mb-8">
-                                    {!! process_figure_links($block->content) !!}
+                                    {!! process_figure_links($block->content, true) !!}
                                 </div>
                             @elseif($block->type === 'sources')
                                 {{-- Блок источников --}}
@@ -152,7 +152,7 @@
                                         </div>
                                     </div>
                                     <div class="prose max-w-none text-gray-700 leading-relaxed">
-                                        {!! process_figure_links($block->content) !!}
+                                        {!! process_figure_links($block->content, true) !!}
                                     </div>
                                 </div>
                             @endif

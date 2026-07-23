@@ -70,7 +70,7 @@ class Term extends Model
     public function getProcessedDefinitionAttribute(): string
     {
         if (function_exists('process_figure_links')) {
-            return process_figure_links($this->definition);
+            return process_figure_links($this->definition, true);
         }
 
         return $this->definition;
